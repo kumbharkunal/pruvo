@@ -11,9 +11,8 @@ const LENS_R = 118;
  * Takes over the hero once the CSS intro has played.
  * - Mouse/trackpad on wide screens: the blueprint dissolves and returns as a lens that follows the
  *   pointer (critically damped), resting on the car when the pointer leaves.
- * - Touch or narrow screens: the blueprint settles into a split with a draggable scan bar, which
- *   auto-sweeps once (under 5 s, so no pause control is needed). touch-action: pan-y keeps vertical
- *   scrolling native.
+ * - Touch or narrow screens: the blueprint settles into a split with a draggable scan bar (its grip
+ *   carries the drag cue, so nothing moves on its own). touch-action: pan-y keeps vertical scrolling native.
  * - Everyone: a real range input drives the same view for keyboard and screen-reader users.
  * Only transform, opacity and clip-path change; all work pauses while the hero is off screen.
  */
@@ -139,34 +138,12 @@ export function HeroLens({ label }: { label: string }) {
         timers.push(window.setTimeout(() => (xray.style.transition = ""), 650));
       });
 
-      let interacted = false;
-      // One short nudge to show the bar is draggable (touch, motion allowed), then rest.
-      if (!reduce && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-        timers.push(
-          window.setTimeout(() => {
-            const t0 = performance.now(), dur = 1100, a = rest, b = Math.max(scanFrom + 0.1, rest - 0.08);
-            const tick = (now: number) => {
-              if (interacted) return;
-              const t = Math.min(1, (now - t0) / dur);
-              const wave = Math.sin(Math.PI * t); // 0 → 1 → 0
-              const eased = wave * wave * (3 - 2 * wave);
-              split = a + (b - a) * eased;
-              apply();
-              if (t < 1) raf = requestAnimationFrame(tick);
-            };
-            raf = requestAnimationFrame(tick);
-          }, 900),
-        );
-      }
-
       const toSplit = (clientX: number) => {
         split = Math.min(scanTo, Math.max(scanFrom, (clientX - rect.left) / rect.width));
         apply();
       };
       let dragging = false;
       const down = (e: PointerEvent) => {
-        interacted = true;
-        cancelAnimationFrame(raf);
         dragging = true;
         refreshRect();
         handleEl.setPointerCapture(e.pointerId);
@@ -186,8 +163,6 @@ export function HeroLens({ label }: { label: string }) {
       });
       api.current = {
         setFromRange: (v) => {
-          interacted = true;
-          cancelAnimationFrame(raf);
           split = scanFrom + ((scanTo - scanFrom) * v) / 100;
           apply();
         },
