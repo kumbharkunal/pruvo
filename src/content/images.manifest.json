@@ -1,0 +1,178 @@
+{
+  "hero-desktop": {
+    "v": "2991b79e",
+    "width": 1672,
+    "height": 941,
+    "widths": [
+      640,
+      828,
+      1080,
+      1280,
+      1672
+    ],
+    "blur": "data:image/webp;base64,UklGRkwAAABXRUJQVlA4IEAAAACwAQCdASoQAAkAA4BaJQBOgCHfvefAAP74USwPxwUGJrmsX+JafmGV3XbBh69lmRWiZU6W5oF8gqnBOcR1xcAA",
+    "focal": [
+      0.66,
+      0.62
+    ],
+    "alt": "A white compact SUV in a dark navy studio, lit along its roofline and wheel arches",
+    "xray": {
+      "widths": [
+        640,
+        828,
+        1080,
+        1280,
+        1672
+      ]
+    },
+    "car": {
+      "x0": 0.3523,
+      "y0": 0.3188,
+      "x1": 0.9689,
+      "y1": 0.8916
+    }
+  },
+  "hero-mobile": {
+    "v": "9fba55d9",
+    "width": 941,
+    "height": 1672,
+    "widths": [
+      480,
+      640,
+      828,
+      941
+    ],
+    "blur": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADQAwCdASoQABwAPu1iqU2ppaQiMAgBMB2JYwCw7Glfi31Sw2CtowAA/v5HuYe+qyTRB8cjtlA14J3bR/CKdzLcSdfc4abCY5oBXE+gQmeXjvkqwWy6+OQwOmBK9H7PY4LprBwawk5IqEhAAAA=",
+    "focal": [
+      0.5,
+      0.7
+    ],
+    "alt": "A white compact SUV in a dark navy studio, lit along its roofline and wheel arches",
+    "xray": {
+      "widths": [
+        480,
+        640,
+        828,
+        941
+      ]
+    },
+    "car": {
+      "x0": 0.0351,
+      "y0": 0.5335,
+      "x1": 0.9692,
+      "y1": 0.8511
+    }
+  },
+  "pdi-delivery-bay": {
+    "v": "89f96caa",
+    "width": 1448,
+    "height": 1086,
+    "widths": [
+      480,
+      640,
+      828,
+      1080,
+      1280,
+      1448
+    ],
+    "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAwAgCdASoQAAwAA4BaJQBOgMXI1Nlhxdt80AD+4lZDmia63mPst1b1IdjeFfoC6vdRYUPMUoV+uFizCk1/Ez3oSx4S1RScsOQPR4OF0X81fJwScej4Y7qrS8bwAA==",
+    "focal": [
+      0.55,
+      0.5
+    ],
+    "alt": "A Pruvo engineer checks paint thickness on a new blue sedan's front fender in a dealership delivery bay while the buyer watches"
+  },
+  "preowned-inspection": {
+    "v": "04740276",
+    "width": 1448,
+    "height": 1086,
+    "widths": [
+      480,
+      640,
+      828,
+      1080,
+      1280,
+      1448
+    ],
+    "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAAAQAgCdASoQAAwAA4BaJZwAD4tK4VESWqQAAP7GA+GaJjrM+pWZa813UDWXWTbWNOiGA5Zx8A+9MWm6Tt+qneiF7EiLl4n8CGweZFs0d+gi287Ly+46HkVINKgQ2MqNI3x8XYEAAAA=",
+    "focal": [
+      0.5,
+      0.5
+    ],
+    "alt": "A Pruvo engineer inspects the engine bay of a used silver hatchback with a torch in a housing-society parking area as the seller looks on"
+  },
+  "obd-scan-closeup": {
+    "v": "410a5bff",
+    "width": 1448,
+    "height": 1086,
+    "widths": [
+      320,
+      480,
+      640,
+      828,
+      1080,
+      1448
+    ],
+    "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADQAQCdASoQAAwAA4BaJYwCdAC8WwrkgAD+8zfqv6AirdlktVqm++e5JzOif8pBac892fYLROL763sL3XmjmYpwpNj5sEgAAAA=",
+    "focal": [
+      0.62,
+      0.45
+    ],
+    "alt": "A gloved hand plugs an OBD diagnostic connector into the port under a car's dashboard, with live graphs on a tablet behind"
+  },
+  "paint-gauge-macro": {
+    "v": "f524a794",
+    "width": 1448,
+    "height": 1086,
+    "widths": [
+      320,
+      480,
+      640,
+      828,
+      1080,
+      1448
+    ],
+    "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADQAQCdASoQAAwAA4BaJQBdgBVY5X3+2AD+fp9eeQA8adHIk2A45P/Zr3A6go6DuMcO5uKEFYepBFUKOBtm6THHETknKsIERtHGN6hlotM+7hykTMSuAAAA",
+    "focal": [
+      0.4,
+      0.45
+    ],
+    "alt": "A paint-thickness gauge pressed against a dark blue door panel next to the panel gap"
+  },
+  "underbody-inspection": {
+    "v": "0728a6a0",
+    "width": 1448,
+    "height": 1086,
+    "widths": [
+      320,
+      480,
+      640,
+      828,
+      1080,
+      1448
+    ],
+    "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADQAQCdASoQAAwAA4BaJQBdgCPsIMtYUAD+9Xw3OyzVXmZ9sLnDyte+7cgUyarKYdvC6SYiSWU8SnTFZ/QZWPRQ+gj3zf+gAAA=",
+    "focal": [
+      0.55,
+      0.45
+    ],
+    "alt": "An engineer on a creeper shines a torch at a car's suspension arm and exhaust hangers in a basement car park"
+  },
+  "inspector-portrait": {
+    "v": "b22f5ce6",
+    "width": 1086,
+    "height": 1448,
+    "widths": [
+      480,
+      640,
+      828,
+      1086
+    ],
+    "blur": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAAAwBACdASoQABUAPu1iqU2ppaOiMAgBMB2JYwC7ACIcrXwMejh4JHHqdnAA/vDU1BMZVv92aQ5jl+RVkoUZ/u7wLWkTrX8Uvlz5wRL+oIU/K23hKO2TN/i2Rh/cla9Nx4pWJ3YpHdPxaMypalVVuuIsxN18AAAA",
+    "focal": [
+      0.55,
+      0.32
+    ],
+    "alt": "A Pruvo inspection engineer in a navy polo and black gloves holds a tablet in front of a white car"
+  }
+}
