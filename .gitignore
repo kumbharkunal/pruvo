@@ -1,0 +1,41 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
+
+# testing / QA output
+/coverage
+/test-results
+/playwright-report
+/.lighthouse
+/.jury
+/lab
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# env files (example file is safe to commit)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# local Claude settings
+.claude/settings.local.json
+
+# private client material: never commit
+_reference/
+_references/
+_internal/
+assets-src/
+assests-src/
