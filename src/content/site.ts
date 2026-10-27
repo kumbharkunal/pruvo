@@ -139,7 +139,7 @@ export const report = {
 export const how = {
   title: "How it works",
   steps: [
-    { title: "Book", body: "Send the form or message us on WhatsApp with the car, city and date. Our team will get in touch with you shortly." },
+    { title: "Book", body: "Send the form or message us on WhatsApp with the car, the city and a date that suits you." },
     /** CONFIRM WITH CLIENT: where inspections take place. */
     { title: "An engineer inspects", body: "A certified engineer inspects the car where it is: at the dealership, or wherever the seller keeps it." },
     /** CONFIRM WITH CLIENT: report format and turnaround. */
@@ -220,7 +220,7 @@ export const booking = {
 };
 
 export const footer = {
-  blurb: "Independent new-car PDI and pre-owned car inspections.",
+  blurb: "Pre-delivery and pre-purchase car inspections, with a photo report you can act on.",
   copyright: "© 2026 Pruvo",
   demoNote: "Demo website. Sample report values are illustrative.",
 };

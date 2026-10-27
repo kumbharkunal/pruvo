@@ -46,6 +46,10 @@ Photos are AI stand-ins until Pruvo supplies real ones. Prompts for every slot a
 
 A slot without a file renders an on-brand placeholder, so the page never breaks.
 
+## Fonts
+
+Archivo is self-hosted from `src/assets/fonts/archivo-latin-var.woff2`, cut by `node scripts/fonts.mjs` to Basic Latin plus the symbols the copy uses, weights 400–700 and widths 87–125% (44 KB). If new copy needs a character outside that set (an accented name, a new symbol), add it to `RANGES` in the script and run it again.
+
 ## Brand assets
 
 The logo is a **temporary** crop of Pruvo's own Instagram artwork (`npm run brand`, sources in the git-ignored `_references/`). It is never redrawn or recoloured. Replace `public/brand/*` and the icons in `src/app/` when Pruvo sends a vector logo.

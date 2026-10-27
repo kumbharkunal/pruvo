@@ -199,9 +199,9 @@ export function ReportInteractive({ label, photos }: { label: string; photos: { 
             </span>
           </p>
           <ul className="rp__legend" role="list">
-            <li className="rp__legend--pass">≤160 µm factory range</li>
-            <li className="rp__legend--attention">161–300 repaint likely</li>
-            <li className="rp__legend--fail">&gt;300 filler or repair likely</li>
+            <li className="rp__legend--pass">Up to 160 µm: factory range</li>
+            <li className="rp__legend--attention">161 to 300 µm: repaint likely</li>
+            <li className="rp__legend--fail">Over 300 µm: filler or repair likely</li>
           </ul>
           <p className="rp__fine">Ranges vary by manufacturer. Bumpers are plastic, so they get a visual check.</p>
         </section>
