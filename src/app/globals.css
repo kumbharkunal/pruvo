@@ -77,6 +77,14 @@
   picture {
     display: block;
   }
+  /* No single word left alone on a last line. */
+  p,
+  li,
+  dd,
+  blockquote,
+  figcaption {
+    text-wrap: pretty;
+  }
   img {
     max-width: 100%;
     height: auto;
@@ -1312,7 +1320,7 @@ html.lenis body {
   font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
   font-stretch: 105%;
   font-weight: 520;
-  line-height: 1.22;
+  line-height: 1.3;
   letter-spacing: -0.01em;
   max-width: 22ch;
 }
