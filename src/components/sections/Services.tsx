@@ -15,6 +15,7 @@ export function Services() {
           <p className="t-lead">{services.sub}</p>
         </header>
         <ServicesToggle
+          tabs={services.tabs}
           images={{
             new: <SmartImage slot="pdi-delivery-bay" sizes={SIZES} className="svc__picture" imgClassName="svc__photo" />,
             used: <SmartImage slot="preowned-inspection" sizes={SIZES} className="svc__picture" imgClassName="svc__photo" />,

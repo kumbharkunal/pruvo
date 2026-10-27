@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { m } from "motion/react";
-import { nav, pageNav, site, whatsappHello } from "@/content/site";
+import dynamic from "next/dynamic";
+import { nav, pageNav, site, whatsappHello } from "@/content/contact";
 import { Logo } from "@/components/ui/Logo";
 import { FacebookLogo, InstagramLogo, WhatsAppLogo, YouTubeLogo } from "@/components/ui/SocialLogo";
 import { openBooking } from "@/lib/booking-events";
@@ -11,6 +11,8 @@ import { lockScroll, scrollToHash } from "@/lib/scroll";
 type Theme = "dark" | "light";
 const NAV_IDS = new Set<string>(nav.map((n) => n.href.slice(1)));
 const EASE_DRAWER = "cubic-bezier(0.32, 0.72, 0, 1)";
+// Motion (shared layoutId) arrives with the first active section, not with the page.
+const NavIndicator = dynamic(() => import("./NavIndicator"), { ssr: false });
 
 /**
  * Floating glass pill. The section under the pill sets its tone (data-theme on each section); the
@@ -165,7 +167,7 @@ export function SiteNav() {
               return (
                 <li key={item.href}>
                   <a href={item.href} className="nav-link" aria-current={active === id ? "true" : undefined} onClick={go}>
-                    {active === id && <m.span layoutId="nav-indicator" className="nav-indicator" transition={{ type: "spring", duration: 0.42, bounce: 0.14 }} />}
+                    {active === id && <NavIndicator />}
                     <span className="nav-link__label">{item.label}</span>
                   </a>
                 </li>

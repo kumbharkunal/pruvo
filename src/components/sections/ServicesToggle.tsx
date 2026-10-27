@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { m } from "motion/react";
-import { services, type ServiceKey } from "@/content/site";
+import type { ServiceKey, services } from "@/content/site";
 import { CheckGlyph } from "@/components/ui/CheckGlyph";
 
 const KEYS: ServiceKey[] = ["new", "used"];
 
 /**
- * New car / Pre-owned: a tabs pattern (arrow keys, Home/End) with a shared-layout thumb. The selector
+ * New car / Pre-owned: a tabs pattern (arrow keys, Home/End) whose thumb slides between two equal
+ * segments (a CSS transform, so nothing heavy loads with the page). The selector
  * changes the scene, not just the copy: photo, line, timing and checklist all switch together.
  * Choice is kept in ?service= and carried into the booking sheet by the CTA.
  */
-export function ServicesToggle({ images }: { images: Record<ServiceKey, React.ReactNode> }) {
+export function ServicesToggle({ tabs: content, images }: { tabs: (typeof services)["tabs"]; images: Record<ServiceKey, React.ReactNode> }) {
   const [active, setActive] = useState<ServiceKey>("new");
   const tabs = useRef<Record<ServiceKey, HTMLButtonElement | null>>({ new: null, used: null });
 
@@ -42,7 +42,8 @@ export function ServicesToggle({ images }: { images: Record<ServiceKey, React.Re
 
   return (
     <div className="svc">
-      <div role="tablist" aria-label="Choose a service" className="seg" onKeyDown={onKeyDown}>
+      <div role="tablist" aria-label="Choose a service" className="seg" data-active={active} onKeyDown={onKeyDown}>
+        <span className="seg__thumb" aria-hidden="true" />
         {KEYS.map((k) => (
           <button
             key={k}
@@ -58,8 +59,7 @@ export function ServicesToggle({ images }: { images: Record<ServiceKey, React.Re
             className="seg__btn"
             onClick={() => select(k)}
           >
-            {active === k && <m.span layoutId="svc-thumb" className="seg__thumb" transition={{ type: "spring", duration: 0.42, bounce: 0.12 }} />}
-            <span className="seg__label">{services.tabs[k].label}</span>
+            <span className="seg__label">{content[k].label}</span>
           </button>
         ))}
       </div>
@@ -74,7 +74,7 @@ export function ServicesToggle({ images }: { images: Record<ServiceKey, React.Re
         </div>
 
         {KEYS.map((k) => {
-          const t = services.tabs[k];
+          const t = content[k];
           return (
             <div key={k} role="tabpanel" id={`svc-panel-${k}`} aria-labelledby={`svc-tab-${k}`} hidden={active !== k} className="svc__panel" tabIndex={0}>
               <h3 className="svc__name">{t.name}</h3>

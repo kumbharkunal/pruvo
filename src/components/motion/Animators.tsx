@@ -155,10 +155,20 @@ export default function Animators() {
       portrait();
       return () => undoCheckpoints?.();
     });
-    // Pin and trigger positions depend on web fonts and images; measure again once they're in.
+    // Pin and trigger positions depend on web fonts, images and on sections rendering lazily
+    // (content-visibility: auto); measure again whenever one of them settles to its real size.
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
-    window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
-    return () => mm.revert();
+    let settle = 0;
+    const resized = new ResizeObserver(() => {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+    });
+    document.querySelectorAll("main > section, footer").forEach((el) => resized.observe(el));
+    return () => {
+      resized.disconnect();
+      window.clearTimeout(settle);
+      mm.revert();
+    };
   });
 
   return smooth ? (

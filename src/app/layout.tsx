@@ -1,12 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { CHECKPOINTS, site } from "@/content/site";
-import { MotionProvider } from "@/components/motion/MotionProvider";
 import { BookingRoot, type RelayMode } from "@/components/booking/BookingRoot";
 
 // One variable family: the width axis gives the expanded display cut, the text cut and condensed data labels.
-const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], display: "swap", variable: "--font-archivo" });
+// Self-hosted and cut down by scripts/fonts.mjs (Basic Latin plus the copy's symbols, weights 400–700,
+// widths 87–125%): 44 KB instead of 89 KB for Google's full latin file.
+const archivo = localFont({
+  src: [{ path: "../assets/fonts/archivo-latin-var.woff2", weight: "400 700", style: "normal" }],
+  declarations: [{ prop: "font-stretch", value: "87% 125%" }],
+  display: "swap",
+  adjustFontFallback: "Arial",
+  variable: "--font-archivo",
+});
 
 const isDemo = (process.env.NEXT_PUBLIC_SITE_ENV ?? "demo") === "demo";
 const relay = (["off", "dry-run", "on"].includes(process.env.BOOKING_RELAY ?? "") ? process.env.BOOKING_RELAY : "off") as RelayMode;
@@ -57,7 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <MotionProvider>{children}</MotionProvider>
+        {children}
         <BookingRoot relay={relay} />
       </body>
     </html>

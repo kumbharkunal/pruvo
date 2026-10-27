@@ -190,10 +190,40 @@ await mkdir(out("public/brand"), { recursive: true });
 const light = await cutout("light");
 const dark = await cutout("dark");
 
+/**
+ * Drops the haze the screenshot crops carry: anything further than 3px from the solid mark (shield and
+ * letters, alpha over 160) becomes transparent, so the anti-aliased edges stay and the ghost marks go.
+ */
+async function clearHaze(png) {
+  const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width, h = info.height, r = 3;
+  const solid = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) solid[i] = data[i * 4 + 3] > 160 ? 1 : 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let near = false;
+      for (let dy = -r; dy <= r && !near; dy++) {
+        const yy = y + dy;
+        if (yy < 0 || yy >= h) continue;
+        for (let dx = -r; dx <= r; dx++) {
+          const xx = x + dx;
+          if (xx >= 0 && xx < w && solid[yy * w + xx]) {
+            near = true;
+            break;
+          }
+        }
+      }
+      if (!near) data[(y * w + x) * 4 + 3] = 0;
+    }
+  }
+  return raw(data, w, h).png().toBuffer();
+}
+
 // Full-size PNGs (OG image, footer); 96px-tall WebPs for the nav (sharp at 32px on 3x screens).
 for (const [name, { png }] of Object.entries({ light, dark })) {
-  await sharp(png).png({ compressionLevel: 9 }).toFile(out(`public/brand/pruvo-logo-${name}.png`));
-  await sharp(png).resize({ height: 96, kernel: "lanczos3" }).webp({ quality: 90, alphaQuality: 90, effort: 6 }).toFile(out(`public/brand/pruvo-logo-${name}.webp`));
+  const clean = await clearHaze(png);
+  await sharp(clean).png({ compressionLevel: 9 }).toFile(out(`public/brand/pruvo-logo-${name}.png`));
+  await sharp(clean).resize({ height: 96, kernel: "lanczos3" }).webp({ quality: 70, alphaQuality: 70, effort: 6, smartSubsample: true }).toFile(out(`public/brand/pruvo-logo-${name}.webp`));
 }
 
 // Shield-only mark for icons: the navy rendition's solid shield, largest component only.
@@ -212,7 +242,9 @@ for (const [name, { png }] of Object.entries({ light, dark })) {
     const fitted = await sharp(shield).resize({ width: inner, height: inner, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: "lanczos3" }).png().toBuffer();
     return sharp({ create: { width: size, height: size, channels: 4, background: bg } }).composite([{ input: fitted, gravity: "center" }]).png();
   };
-  await (await icon(64, 0.03, { r: 0, g: 0, b: 0, alpha: 0 })).toFile(out("src/app/icon.png"));
-  await (await icon(180, 0.16, { r: 12, g: 24, b: 60, alpha: 1 })).toFile(out("src/app/apple-icon.png"));
+  // Palette PNGs: the favicon is fetched on every first visit, so it stays a few KB.
+  const lean = { palette: true, quality: 92, colours: 128, compressionLevel: 9, effort: 10 };
+  await (await icon(64, 0.03, { r: 0, g: 0, b: 0, alpha: 0 })).png(lean).toFile(out("src/app/icon.png"));
+  await (await icon(180, 0.16, { r: 12, g: 24, b: 60, alpha: 1 })).png(lean).toFile(out("src/app/apple-icon.png"));
   console.log(`shield: ${box.width}×${box.height} (square ${sq}) → icon.png 64, apple-icon.png 180`);
 }

@@ -17,7 +17,7 @@ export function SampleReport() {
           </h2>
           <p className="t-lead">{report.sub}</p>
         </header>
-        <ReportInteractive photos={photos} />
+        <ReportInteractive label={report.label} photos={photos} />
         <div className="rp__cta">
           <button type="button" className="btn btn--primary btn--lg" data-book="">
             Book an inspection

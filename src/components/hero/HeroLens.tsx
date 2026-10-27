@@ -140,11 +140,11 @@ export function HeroLens({ label }: { label: string }) {
       });
 
       let interacted = false;
-      // One gentle sweep to show the bar is draggable (touch, motion allowed), then rest. Under 5 s.
+      // One short nudge to show the bar is draggable (touch, motion allowed), then rest.
       if (!reduce && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
         timers.push(
           window.setTimeout(() => {
-            const t0 = performance.now(), dur = 2200, a = rest, b = Math.max(scanFrom + 0.1, 0.36);
+            const t0 = performance.now(), dur = 1100, a = rest, b = Math.max(scanFrom + 0.1, rest - 0.08);
             const tick = (now: number) => {
               if (interacted) return;
               const t = Math.min(1, (now - t0) / dur);

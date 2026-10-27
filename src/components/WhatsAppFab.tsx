@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { whatsappHello } from "@/content/site";
+import { whatsappHello } from "@/content/contact";
 import { WhatsAppLogo } from "@/components/ui/SocialLogo";
 
 /**

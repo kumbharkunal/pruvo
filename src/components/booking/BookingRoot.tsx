@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { BOOK_EVENT, type ServicePreset } from "@/lib/booking-events";
+import { FIRST_INTERACTION } from "@/components/motion/Enhance";
 
 export type RelayMode = "off" | "dry-run" | "on";
 
@@ -11,8 +12,8 @@ const warmSheet = () => void import("./BookingSheet");
 
 /**
  * One delegated listener opens the sheet from any [data-book] control, so CTAs stay server-rendered.
- * The sheet's code (Base UI Drawer + zod) is fetched on hover, touch or focus of a CTA, or once the
- * page is idle, so it never weighs on first load.
+ * The sheet's code (Base UI Drawer + zod) is fetched with the visitor's first interaction (and on hover,
+ * touch or focus of a CTA), so it never weighs on first load.
  */
 export function BookingRoot({ relay }: { relay: RelayMode }) {
   const [mounted, setMounted] = useState(false);
@@ -41,16 +42,18 @@ export function BookingRoot({ relay }: { relay: RelayMode }) {
     document.addEventListener("pointerover", warm, { passive: true });
     document.addEventListener("touchstart", warm, { passive: true });
     document.addEventListener("focusin", warm);
-    const hasIdle = typeof window.requestIdleCallback === "function"; // Safari has none
-    const idle = hasIdle ? window.requestIdleCallback(warmSheet, { timeout: 6000 }) : setTimeout(warmSheet, 4000);
+    const first = () => {
+      FIRST_INTERACTION.forEach((type) => window.removeEventListener(type, first));
+      warmSheet();
+    };
+    FIRST_INTERACTION.forEach((type) => window.addEventListener(type, first, { passive: true }));
     return () => {
       document.removeEventListener("click", onClick);
       window.removeEventListener(BOOK_EVENT, onEvent);
       document.removeEventListener("pointerover", warm);
       document.removeEventListener("touchstart", warm);
       document.removeEventListener("focusin", warm);
-      if (hasIdle) window.cancelIdleCallback(idle as number);
-      else clearTimeout(idle as ReturnType<typeof setTimeout>);
+      FIRST_INTERACTION.forEach((type) => window.removeEventListener(type, first));
     };
   }, []);
 

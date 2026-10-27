@@ -38,6 +38,18 @@ export function slotLoader(name: SlotName, entry: SlotEntry, format: "avif" | "w
   return ({ width }: ImageLoaderProps) => `/images/${name}/${name}${variant}-${pick(entry.widths, width)}.${entry.v}.${format}`;
 }
 
+/** Collapses srcset entries that resolve to the same file and labels each with the file's real width. */
+function tidySrcSet(srcSet: string | undefined) {
+  if (!srcSet) return srcSet;
+  const files = new Map<string, number>();
+  for (const entry of srcSet.split(", ")) {
+    const url = entry.split(" ")[0];
+    const width = Number(url.match(/-(\d+)\.[0-9a-f]+\.(?:avif|webp)$/)?.[1]);
+    if (url && width && !files.has(url)) files.set(url, width);
+  }
+  return [...files].map(([url, width]) => `${url} ${width}w`).join(", ");
+}
+
 type SourceOptions = {
   sizes: string;
   variant?: "" | "-xray";
@@ -61,6 +73,8 @@ export function slotSources(name: SlotName, opts: SourceOptions) {
   };
   const avif = getImageProps({ ...base, loader: slotLoader(name, entry, "avif", opts.variant) }).props;
   const webp = getImageProps({ ...base, loader: slotLoader(name, entry, "webp", opts.variant) }).props;
+  avif.srcSet = tidySrcSet(avif.srcSet);
+  webp.srcSet = tidySrcSet(webp.srcSet);
   return { entry, avif, webp };
 }
 

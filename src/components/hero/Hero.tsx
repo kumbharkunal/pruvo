@@ -56,15 +56,18 @@ function Markers({ list, variant, from, to }: { list: Marker[]; variant: "wide" 
   );
 }
 
-// Runs during HTML parse, before React: start the CSS intro once the photo AND its twin have decoded,
-// so the sweep never runs over an empty stage. Reduced motion or a slow network get the static split.
-const READY = `(function(){var s=document.getElementById("hero-stage");if(!s)return;if(matchMedia("(prefers-reduced-motion: reduce)").matches){s.dataset.state="static";return}var imgs=[].slice.call(s.querySelectorAll(".hero__layer img")),n=0,done=false;function go(){if(done)return;done=true;requestAnimationFrame(function(){requestAnimationFrame(function(){s.dataset.state="intro"})})}function one(){if(++n>=imgs.length)go()}imgs.forEach(function(i){if(i.complete&&i.naturalWidth)one();else{i.addEventListener("load",one,{once:true});i.addEventListener("error",one,{once:true})}});setTimeout(function(){if(!done){done=true;s.dataset.state="static"}},4500)})();`;
+// Runs during HTML parse, before React. The photo is the LCP and loads first; the x-ray twin is requested
+// only after the browser reports its first paint (its srcset waits in data- attributes), then the CSS intro
+// starts once the twin has decoded. Reduced motion or a slow network get the static split.
+const READY = `(function(){var s=document.getElementById("hero-stage");if(!s)return;var p=s.querySelector(".hero__photo img"),x=s.querySelector(".hero__xray"),r=matchMedia("(prefers-reduced-motion: reduce)").matches,done=false;function set(v){if(!done){done=true;s.dataset.state=v}}if(r)set("static");function twin(){if(!x)return;var i=x.querySelector("img");[].forEach.call(x.querySelectorAll("[data-srcset]"),function(e){e.srcset=e.getAttribute("data-srcset")});if(i&&i.getAttribute("data-src"))i.src=i.getAttribute("data-src");if(!i)return;function go(){requestAnimationFrame(function(){requestAnimationFrame(function(){set("intro")})})}if(i.complete&&i.naturalWidth)go();else{i.addEventListener("load",go,{once:true});i.addEventListener("error",function(){set("static")},{once:true})}}function painted(){var ran=false;function run(){if(!ran){ran=true;setTimeout(twin,0)}}try{var o=new PerformanceObserver(function(l){if(l.getEntries().length){o.disconnect();run()}});o.observe({type:"paint",buffered:true})}catch(e){}setTimeout(run,1000)}if(!p||(p.complete&&p.naturalWidth))painted();else{p.addEventListener("load",painted,{once:true});p.addEventListener("error",painted,{once:true})}setTimeout(function(){set("static")},4500)})();`;
 
 export function Hero() {
   const photoWide = slotSources("hero-desktop", { sizes: SIZES_WIDE, loading: "eager", fetchPriority: "high" });
   const photoNarrow = slotSources("hero-mobile", { sizes: SIZES_NARROW, loading: "eager", fetchPriority: "high" });
   const twinWide = slotSources("hero-desktop", { sizes: SIZES_WIDE, variant: "-xray", alt: "", loading: "eager", fetchPriority: "low" });
   const twinNarrow = slotSources("hero-mobile", { sizes: SIZES_NARROW, variant: "-xray", alt: "", loading: "eager", fetchPriority: "low" });
+  // The twin's fallback <img> carries its URLs in data- attributes until READY swaps them in.
+  const twinImg = twinNarrow && (({ src, srcSet, ...rest }) => ({ src, srcSet, rest }))(twinNarrow.webp);
 
   const wide = photoWide ? scanRange(photoWide.entry) : { from: 0.33, to: 0.99, top: 0.32, bottom: 0.89 };
   const narrow = photoNarrow ? scanRange(photoNarrow.entry) : { from: 0.02, to: 0.99, top: 0.53, bottom: 0.85 };
@@ -95,12 +98,12 @@ export function Hero() {
               <img {...photoNarrow.webp} alt={photoNarrow.entry.alt} />
             </picture>
           )}
-          {twinWide && twinNarrow && (
+          {twinWide && twinNarrow && twinImg && (
             <picture className="hero__layer hero__xray">
-              <source media={WIDE} type="image/avif" srcSet={twinWide.avif.srcSet} sizes={twinWide.avif.sizes} />
-              <source media={WIDE} type="image/webp" srcSet={twinWide.webp.srcSet} sizes={twinWide.webp.sizes} />
-              <source type="image/avif" srcSet={twinNarrow.avif.srcSet} sizes={twinNarrow.avif.sizes} />
-              <img {...twinNarrow.webp} alt="" />
+              <source media={WIDE} type="image/avif" data-srcset={twinWide.avif.srcSet} sizes={twinWide.avif.sizes} />
+              <source media={WIDE} type="image/webp" data-srcset={twinWide.webp.srcSet} sizes={twinWide.webp.sizes} />
+              <source type="image/avif" data-srcset={twinNarrow.avif.srcSet} sizes={twinNarrow.avif.sizes} />
+              <img {...twinImg.rest} data-src={twinImg.src} data-srcset={twinImg.srcSet} alt="" />
             </picture>
           )}
           <span className="hero__plane" aria-hidden="true" />

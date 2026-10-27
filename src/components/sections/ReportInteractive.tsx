@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconAlertTriangle, IconCircleCheck, IconCircleX } from "@tabler/icons-react";
-import { report } from "@/content/site";
 import { PAINT_RANGES, paintStatus, sampleReport, type Status } from "@/content/report";
 
 const km = new Intl.NumberFormat("en-IN").format(sampleReport.odometerKm);
@@ -94,7 +93,7 @@ const PANES: { id: Pane; label: string }[] = [
   { id: "photos", label: "Photos" },
 ];
 
-export function ReportInteractive({ photos }: { photos: { caption: string; node: React.ReactNode }[] }) {
+export function ReportInteractive({ label, photos }: { label: string; photos: { caption: string; node: React.ReactNode }[] }) {
   const r = sampleReport;
   const [pane, setPane] = useState<Pane>("summary");
   const [panel, setPanel] = useState("rf-fender");
@@ -136,7 +135,7 @@ export function ReportInteractive({ photos }: { photos: { caption: string; node:
             <span>{r.type}</span>
           </p>
         </div>
-        <p className="rp__label">{report.label}</p>
+        <p className="rp__label">{label}</p>
       </header>
 
       <div className="rp__switch" role="group" aria-label="Report views">

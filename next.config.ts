@@ -23,7 +23,6 @@ const security = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
   { key: "X-Frame-Options", value: "DENY" },
-  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
   ...(isProd ? [{ key: "Content-Security-Policy", value: csp }] : []),
   ...(isDemo ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] : []),
@@ -33,6 +32,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    // Lets LazyMotion's features stay in their own async chunk instead of riding in with the barrel.
+    optimizePackageImports: ["motion", "framer-motion"],
+  },
   turbopack: {
     rules: {
       "*.css": {

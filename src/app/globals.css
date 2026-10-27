@@ -194,6 +194,61 @@ html.lenis body {
   position: relative;
   padding-block: clamp(80px, 10vw, 128px);
 }
+/* Below the hero, sections skip style, layout and paint until they near the viewport, so the first paint
+   only has to lay out the first screen. Desktop's pinned checkpoints stage is the exception: containment
+   would capture its position: fixed pin. */
+.section,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 1000px;
+}
+.why {
+  contain-intrinsic-block-size: auto 1650px;
+}
+.svc-section {
+  contain-intrinsic-block-size: auto 1250px;
+}
+.cp {
+  contain-intrinsic-block-size: auto 1650px;
+}
+.rp-section {
+  contain-intrinsic-block-size: auto 1150px;
+}
+.how {
+  contain-intrinsic-block-size: auto 740px;
+}
+.wp {
+  contain-intrinsic-block-size: auto 1500px;
+}
+.faq {
+  contain-intrinsic-block-size: auto 790px;
+}
+.book {
+  contain-intrinsic-block-size: auto 600px;
+}
+@media (min-width: 1024px) {
+  .cp {
+    content-visibility: visible;
+  }
+  .svc-section {
+    contain-intrinsic-block-size: auto 980px;
+  }
+  .rp-section {
+    contain-intrinsic-block-size: auto 2000px;
+  }
+  .how {
+    contain-intrinsic-block-size: auto 550px;
+  }
+  .wp {
+    contain-intrinsic-block-size: auto 1000px;
+  }
+  .book {
+    contain-intrinsic-block-size: auto 430px;
+  }
+  .footer {
+    contain-intrinsic-block-size: auto 450px;
+  }
+}
 .section--paper {
   background: var(--color-paper);
   color: var(--color-ink-900);
@@ -1318,7 +1373,8 @@ html.lenis body {
 /* ───────────────────────── Services toggle ───────────────────────── */
 .seg {
   position: relative;
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
   padding: 4px;
   border-radius: 999px;
   background: #fff;
@@ -1343,9 +1399,16 @@ html.lenis body {
 }
 .seg__thumb {
   position: absolute;
-  inset: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
   border-radius: 999px;
   background: var(--color-bay-900);
+  transition: transform 0.32s var(--ease-in-out);
+}
+.seg[data-active="used"] .seg__thumb {
+  transform: translateX(100%);
 }
 .seg__label {
   position: relative;
