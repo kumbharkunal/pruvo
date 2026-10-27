@@ -1,0 +1,16 @@
+# Upload only what the build needs. Private client material never leaves this machine.
+_internal
+_reference
+_references
+assets-src
+assests-src
+lab
+.claude
+.next
+.env*
+!.env.example
+coverage
+test-results
+playwright-report
+.lighthouse
+.jury
