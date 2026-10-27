@@ -75,6 +75,7 @@ function verifyFacts() {
   if (!el) return;
   SplitText.create(el, {
     type: "words",
+    aria: "none",
     autoSplit: true,
     onSplit(self) {
       return gsap.fromTo(
@@ -90,7 +91,7 @@ function verifyFacts() {
 function reveals() {
   gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
     if (ScrollTrigger.isInViewport(el, 0.01)) return;
-    gsap.from(el, { y: 14, autoAlpha: 0, duration: 0.62, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+    gsap.from(el, { y: 14, opacity: 0, duration: 0.62, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%", once: true } });
   });
 }
 
@@ -101,7 +102,7 @@ function howItWorks() {
   const tl = gsap.timeline({ scrollTrigger: { trigger: list, start: "top 82%", once: true } });
   tl.from("[data-how-rule]", { scaleX: 0, scaleY: 0, duration: 0.9, ease: "expo.out" }).from(
     "[data-how-step]",
-    { y: 14, autoAlpha: 0, stagger: 0.06, duration: 0.62, ease: "expo.out" },
+    { y: 14, opacity: 0, stagger: 0.06, duration: 0.62, ease: "expo.out" },
     0.1,
   );
 }

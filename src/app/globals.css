@@ -1691,7 +1691,12 @@ html.lenis body {
     height: 34px;
   }
   .cp__detail {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .cp.is-armed .cp__row {
     opacity: 0.55;
@@ -1703,7 +1708,12 @@ html.lenis body {
     opacity: 1;
   }
   .cp.is-armed .cp__row.is-active .cp__detail {
-    display: block;
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
   }
   .cp.is-armed .cp__row.is-active .cp__icon {
     background: var(--color-blue-600);

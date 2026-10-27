@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { site } from "@/content/site";
 
+// No eval-compiled parsers: the CSP forbids eval, and Zod's probe for it would be reported as a violation.
+z.config({ jitless: true });
+
 /** Shared by the booking sheet (client) and the optional Google Form relay (server). */
 
 export type BookingForm = {

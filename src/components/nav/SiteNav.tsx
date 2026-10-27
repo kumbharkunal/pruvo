@@ -176,9 +176,9 @@ export function SiteNav() {
             <a href={whatsappHello} className="nav-wa" target="_blank" rel="noopener" aria-label="Chat with Pruvo on WhatsApp">
               <WhatsAppLogo className="nav-wa__logo" />
             </a>
-            <button type="button" className="btn btn--primary btn--sm nav-book" data-book="">
+            <button type="button" className="btn btn--primary btn--sm nav-book" data-book="" aria-label="Book an inspection">
               <span className="nav-book__long">Book an inspection</span>
-              <span className="nav-book__short" aria-hidden="true">Book</span>
+              <span className="nav-book__short">Book</span>
             </button>
             <button ref={toggle} type="button" className="nav-toggle" aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label="Open menu" onClick={openMenu}>
               <span />
