@@ -57,9 +57,10 @@ function Markers({ list, variant, from, to }: { list: Marker[]; variant: "wide" 
 }
 
 // Runs during HTML parse, before React. The photo is the LCP and loads first; the x-ray twin is requested
-// only after the browser reports its first paint (its srcset waits in data- attributes), then the CSS intro
-// starts once the twin has decoded. Reduced motion or a slow network get the static split.
-const READY = `(function(){var s=document.getElementById("hero-stage");if(!s)return;var p=s.querySelector(".hero__photo img"),x=s.querySelector(".hero__xray"),r=matchMedia("(prefers-reduced-motion: reduce)").matches,done=false;function set(v){if(!done){done=true;s.dataset.state=v}}if(r)set("static");function twin(){if(!x)return;var i=x.querySelector("img");[].forEach.call(x.querySelectorAll("[data-srcset]"),function(e){e.srcset=e.getAttribute("data-srcset")});if(i&&i.getAttribute("data-src"))i.src=i.getAttribute("data-src");if(!i)return;function go(){requestAnimationFrame(function(){requestAnimationFrame(function(){set("intro")})})}if(i.complete&&i.naturalWidth)go();else{i.addEventListener("load",go,{once:true});i.addEventListener("error",function(){set("static")},{once:true})}}function painted(){var ran=false;function run(){if(!ran){ran=true;setTimeout(twin,0)}}try{var o=new PerformanceObserver(function(l){if(l.getEntries().length){o.disconnect();run()}});o.observe({type:"paint",buffered:true})}catch(e){}setTimeout(run,1000)}if(!p||(p.complete&&p.naturalWidth))painted();else{p.addEventListener("load",painted,{once:true});p.addEventListener("error",painted,{once:true})}setTimeout(function(){set("static")},4500)})();`;
+// only once the browser reports the photo as painted (its LCP entry; first paint where that API is missing),
+// with its srcset waiting in data- attributes. The CSS intro starts once the twin has decoded. Reduced
+// motion or a slow network get the static split.
+const READY = `(function(){var s=document.getElementById("hero-stage");if(!s)return;var p=s.querySelector(".hero__photo img"),x=s.querySelector(".hero__xray"),r=matchMedia("(prefers-reduced-motion: reduce)").matches,done=false;function set(v){if(!done){done=true;s.dataset.state=v}}if(r)set("static");function twin(){if(!x)return;var i=x.querySelector("img");[].forEach.call(x.querySelectorAll("[data-srcset]"),function(e){e.srcset=e.getAttribute("data-srcset")});if(i&&i.getAttribute("data-src"))i.src=i.getAttribute("data-src");if(!i)return;function go(){requestAnimationFrame(function(){requestAnimationFrame(function(){set("intro")})})}if(i.complete&&i.naturalWidth)go();else{i.addEventListener("load",go,{once:true});i.addEventListener("error",function(){set("static")},{once:true})}}function painted(){var ran=false;function run(){if(!ran){ran=true;setTimeout(twin,0)}}var lcp=PerformanceObserver.supportedEntryTypes&&PerformanceObserver.supportedEntryTypes.indexOf("largest-contentful-paint")>-1;try{var o=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(!lcp||e.element===p){o.disconnect();run()}})});o.observe({type:lcp?"largest-contentful-paint":"paint",buffered:true})}catch(e){}setTimeout(run,1500)}if(!p||(p.complete&&p.naturalWidth))painted();else{p.addEventListener("load",painted,{once:true});p.addEventListener("error",painted,{once:true})}setTimeout(function(){set("static")},4500)})();`;
 
 export function Hero() {
   const photoWide = slotSources("hero-desktop", { sizes: SIZES_WIDE, loading: "eager", fetchPriority: "high" });
@@ -95,7 +96,8 @@ export function Hero() {
               <source media={WIDE} type="image/avif" srcSet={photoWide.avif.srcSet} sizes={photoWide.avif.sizes} />
               <source media={WIDE} type="image/webp" srcSet={photoWide.webp.srcSet} sizes={photoWide.webp.sizes} />
               <source type="image/avif" srcSet={photoNarrow.avif.srcSet} sizes={photoNarrow.avif.sizes} />
-              <img {...photoNarrow.webp} alt={photoNarrow.entry.alt} />
+              {/* The LCP image: decoded in the same frame it can first be shown in, never faded. */}
+              <img {...photoNarrow.webp} decoding="sync" alt={photoNarrow.entry.alt} />
             </picture>
           )}
           {twinWide && twinNarrow && twinImg && (
