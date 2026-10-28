@@ -10,9 +10,11 @@ const LENS_R = 118;
 /**
  * Takes over the hero once the CSS intro has played.
  * - Mouse/trackpad on wide screens: the blueprint dissolves and returns as a lens that follows the
- *   pointer (critically damped), resting on the car when the pointer leaves.
- * - Touch or narrow screens: the blueprint settles into a split with a draggable scan bar (its grip
- *   carries the drag cue, so nothing moves on its own). touch-action: pan-y keeps vertical scrolling native.
+ *   pointer anywhere in the hero, even over the copy (critically damped, kept on the car), and rests on
+ *   the car when the pointer leaves or is on a button.
+ * - Touch or narrow screens: the blueprint settles into a split with a draggable scan bar that rides the
+ *   blueprint's edge as it settles (its grip carries the drag cue, so nothing moves on its own).
+ *   touch-action: pan-y keeps vertical scrolling native.
  * - Everyone: a real range input (transparent, laid over the car) drives the same view for keyboard and
  *   screen-reader users; its focus ring frames the car.
  * Only transform, opacity and clip-path change; all work pauses while the hero is off screen.
@@ -39,6 +41,10 @@ export function HeroLens({ label }: { label: string }) {
     const wide = window.matchMedia("(min-width: 768px)").matches;
     const scanFrom = wide ? pct("--scan-from-w", 0.33) : pct("--scan-from-n", 0.02);
     const scanTo = wide ? pct("--scan-to-w", 0.99) : pct("--scan-to-n", 0.99);
+    const carTop = parseFloat(vars.getPropertyValue("--car-top-w")) || 0.32;
+    const carBot = parseFloat(vars.getPropertyValue("--car-bot-w")) || 0.89;
+    // The headline and CTA layers sit above the stage, so the lens listens on the whole hero.
+    const hero = stage.closest<HTMLElement>(".hero") ?? stage;
 
     let rect = box.getBoundingClientRect();
     const ro = new ResizeObserver(() => (rect = box.getBoundingClientRect()));
@@ -66,8 +72,9 @@ export function HeroLens({ label }: { label: string }) {
 
     const startLens = () => {
       mode.current = "lens";
-      // Freeze the intro's end state inline, then hand over (the animation stops applying with the state change).
-      xray.style.clipPath = `inset(0 ${((1 - scanTo) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
+      // Freeze what is showing (the intro's end, or the static split) inline, then hand over: the animation
+      // stops applying with the state change.
+      xray.style.clipPath = getComputedStyle(xray).clipPath;
       stage.dataset.state = "lens";
       xray.style.opacity = "0";
       const restX = () => rect.width * ((scanFrom + scanTo) / 2 + 0.02);
@@ -98,17 +105,18 @@ export function HeroLens({ label }: { label: string }) {
       );
       const move = (e: PointerEvent) => {
         if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
-        pointer = true;
-        tx = e.clientX - rect.left;
-        ty = e.clientY - rect.top;
+        // On a button or link the lens waits on the car; anywhere else it follows, kept over the car.
+        pointer = !(e.target as Element | null)?.closest?.("a, button");
+        tx = Math.min(rect.width * scanTo, Math.max(rect.width * scanFrom, e.clientX - rect.left));
+        ty = Math.min(rect.height * carBot, Math.max(rect.height * carTop, e.clientY - rect.top));
       };
       const leave = () => (pointer = false);
-      stage.addEventListener("pointermove", move, { passive: true });
-      stage.addEventListener("pointerleave", leave);
+      hero.addEventListener("pointermove", move, { passive: true });
+      hero.addEventListener("pointerleave", leave);
       window.addEventListener("scroll", refreshRect, { passive: true });
       cleanups.push(() => {
-        stage.removeEventListener("pointermove", move);
-        stage.removeEventListener("pointerleave", leave);
+        hero.removeEventListener("pointermove", move);
+        hero.removeEventListener("pointerleave", leave);
         window.removeEventListener("scroll", refreshRect);
       });
       api.current = {
@@ -131,12 +139,26 @@ export function HeroLens({ label }: { label: string }) {
         const v = Math.round(((split - scanFrom) / (scanTo - scanFrom)) * 100);
         if (range.current) range.current.value = String(v);
       };
-      xray.style.clipPath = `inset(0 ${((1 - (reduce ? rest : scanTo)) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
+      // After the intro the bar appears on the blueprint's edge and settles to rest with it; from the static
+      // split (reduced motion, slow network) it simply appears there.
+      const fromIntro = stage.dataset.state === "intro";
+      xray.style.clipPath = getComputedStyle(xray).clipPath;
+      handleEl.style.transform = `translate3d(${((fromIntro ? scanTo : rest) * rect.width).toFixed(1)}px, 0, 0)`;
       stage.dataset.state = "bar";
       requestAnimationFrame(() => {
-        if (!reduce) xray.style.transition = "clip-path 0.5s cubic-bezier(0.23, 1, 0.32, 1)";
+        if (fromIntro) {
+          handleEl.getBoundingClientRect(); // the bar was display: none until now; give its transition a start
+          const ease = "0.5s cubic-bezier(0.23, 1, 0.32, 1)";
+          xray.style.transition = `clip-path ${ease}`;
+          handleEl.style.transition = `transform ${ease}`;
+        }
         apply();
-        timers.push(window.setTimeout(() => (xray.style.transition = ""), 650));
+        timers.push(
+          window.setTimeout(() => {
+            xray.style.transition = "";
+            handleEl.style.transition = "";
+          }, 650),
+        );
       });
 
       const toSplit = (clientX: number) => {
@@ -171,15 +193,21 @@ export function HeroLens({ label }: { label: string }) {
     };
 
     const start = () => (lensMode ? startLens() : startBar());
+    // Hand over when the intro ends, timed from when it started (the inline script stamps data-at), not from
+    // when this component hydrated.
+    const afterIntro = () => {
+      const at = Number(stage.dataset.at);
+      timers.push(window.setTimeout(start, at ? Math.max(0, INTRO_MS - (performance.now() - at)) : INTRO_MS));
+    };
 
     const state = stage.dataset.state;
     if (state === "static") start();
-    else if (state === "intro") timers.push(window.setTimeout(start, INTRO_MS));
+    else if (state === "intro") afterIntro();
     else {
       // The inline script hasn't fired yet (images still decoding): wait for it.
       const mo = new MutationObserver(() => {
         const s = stage.dataset.state;
-        if (s === "intro") timers.push(window.setTimeout(start, INTRO_MS));
+        if (s === "intro") afterIntro();
         else if (s === "static") start();
         else return;
         mo.disconnect();

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { BOOK_EVENT, type ServicePreset } from "@/lib/booking-events";
-import { FIRST_INTERACTION } from "@/components/motion/Enhance";
+import { FIRST_INTERACTION, afterHeroIntro } from "@/components/motion/Enhance";
 
 export type RelayMode = "off" | "dry-run" | "on";
 
@@ -12,8 +12,8 @@ const warmSheet = () => void import("./BookingSheet");
 
 /**
  * One delegated listener opens the sheet from any [data-book] control, so CTAs stay server-rendered.
- * The sheet's code (Base UI Drawer + zod) is fetched with the visitor's first interaction (and on hover,
- * touch or focus of a CTA), so it never weighs on first load.
+ * The sheet's code (Base UI Drawer + zod) is fetched with the visitor's first interaction once the hero
+ * intro has played (and at once on hover, touch or focus of a CTA), so it never weighs on first load.
  */
 export function BookingRoot({ relay }: { relay: RelayMode }) {
   const [mounted, setMounted] = useState(false);
@@ -42,9 +42,10 @@ export function BookingRoot({ relay }: { relay: RelayMode }) {
     document.addEventListener("pointerover", warm, { passive: true });
     document.addEventListener("touchstart", warm, { passive: true });
     document.addEventListener("focusin", warm);
+    let cancelWarm = () => {};
     const first = () => {
       FIRST_INTERACTION.forEach((type) => window.removeEventListener(type, first));
-      warmSheet();
+      cancelWarm = afterHeroIntro(warmSheet);
     };
     FIRST_INTERACTION.forEach((type) => window.addEventListener(type, first, { passive: true }));
     return () => {
@@ -54,6 +55,7 @@ export function BookingRoot({ relay }: { relay: RelayMode }) {
       document.removeEventListener("touchstart", warm);
       document.removeEventListener("focusin", warm);
       FIRST_INTERACTION.forEach((type) => window.removeEventListener(type, first));
+      cancelWarm();
     };
   }, []);
 
