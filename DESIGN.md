@@ -75,6 +75,7 @@ Every car has two layers: the shine the seller shows you, and the proof an engin
 - Spacing steps (px): 4, 8, 12, 16, 24, 32, 48, 64, 96, 128.
 - Radii: 0 for structure, 4 px for sheets, inputs and buttons, 8 px for thumbnails, 999 px only for the nav, toggles and icon buttons.
 - Rhythm: hero (bay) · why inspect (paper) · services (paper) · checkpoints (bay) · sample report (paper) · how it works (paper) · why Pruvo (bay) · FAQ (paper) · booking (bay) · footer (bay-950).
+- The page ends where it began: the booking band closes on the hero car as a line drawing, with the inspection lens resting on its front wheel.
 - Heights use `svh`/`dvh`; there is no `100vh`.
 
 ## 6. Depth and elevation
@@ -91,7 +92,7 @@ No drop shadows on content. Depth comes from the navy steps (950 → 900 → 800
 | `--ease-wipe` | `cubic-bezier(.76, 0, .24, 1)` | the scan plane |
 | `--ease-expo` | `cubic-bezier(.16, 1, .3, 1)` | reveals of 600 ms or more |
 
-- **Hero intro (CSS only, before hydration):** the photo is the LCP and loads alone; an inline script requests the twin once the browser reports the photo as painted, waits for it to decode, then sets `data-state="intro"`. The plane sweeps the car's measured bounds in 1.2 s; the twin's `clip-path` follows; each marker locks on as the plane passes it (ring 220 ms, check draws 260 ms, integer readings count up through `@property --n`).
+- **Hero intro (CSS only, before hydration):** the photo is the LCP and loads alone; an inline script requests the twin once the browser reports the photo as painted, waits for it to decode, then sets `data-state="intro"`. After a 0.15 s beat the plane sweeps the car's measured bounds in 0.95 s; the twin's `clip-path` follows (the twin is masked to the car's band, so no blueprint shows behind the copy); each marker locks on as the plane passes it (ring 220 ms, check draws 260 ms, integer readings count up through `@property --n`).
 - **Handoff:** desktop mouse gets a 236 px lens that follows the pointer through a damped rAF loop; touch and tablets get a scan bar that rests clear of the labels, with a ‹› grip as the drag cue (nothing moves on its own). Both are also an `<input type="range">` labelled "Inspection view"; keyboard focus outlines the whole scan area.
 - **Pages:** moving between the 404 and the homepage is a document navigation with a cross-document view transition (a 300 ms cross-fade).
 - **Scroll (GSAP, loaded on the first scroll, touch, key or mouse movement):** section openers rise 14 px once; "Verify the facts." fills word by word; the checkpoints stage pins on desktop for 12 × 92 px while systems light up in order with their hotspot label, check and evidence photo; on phones each check draws as its row enters. The How-it-works connector draws, then the steps follow. The portrait is uncovered from the bottom.
