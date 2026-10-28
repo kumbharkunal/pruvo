@@ -1111,7 +1111,9 @@ html.lenis body {
   margin: 0;
   max-width: 13em;
 }
+/* Each line is its own block, so the break never depends on which font has loaded (no swap shift). */
 .hero__line {
+  display: block;
   white-space: nowrap;
 }
 .hero__sub {
