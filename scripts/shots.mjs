@@ -50,6 +50,9 @@ async function shoot(name, contextOptions) {
     await walk(page);
     // Pinned sections hold their scroll position; capture from the top so the page reads in order.
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    // Sections far from the viewport skip rendering (content-visibility: auto); a stitched capture needs
+    // them all painted, the way a visitor sees each one as it scrolls in.
+    await page.addStyleTag({ content: ".section, .footer { content-visibility: visible !important; }" });
     await page.waitForTimeout(600);
     await page.screenshot({ path: path.join(out, `${name}-full.png`), fullPage: true });
   }
