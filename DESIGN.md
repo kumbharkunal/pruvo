@@ -59,14 +59,14 @@ Every car has two layers: the shine the seller shows you, and the proof an engin
 ## 4. Components
 
 - **Buttons** (`.btn`): 4 px radius, 600 weight, `min-height` 44 / 52 (`--lg`) / 60 (`--xl`). Primary: `blue-600` with white text. Ghost on navy: `rgb(255 255 255 / .04)` fill, `rgb(214 226 255 / .34)` border. Ghost on paper: `ink-700` border. **Hover is a scan:** a fill sweeps across left to right (280 ms, `--ease-wipe`), white with a navy label on navy surfaces, navy with a white label on paper. Press: `scale(0.97)` over 120 ms. Hover styles only under `(hover: hover) and (pointer: fine)`.
-- **Glass pill nav** (the only glass): fixed, centred, 999 px radius, `color-mix(bay-900 76%)` with `blur(12px) saturate(160%)`, 1 px light border and an inset top highlight. Over paper sections it turns into paper at 80%. It falls back to opaque colour without `backdrop-filter` or under `prefers-reduced-transparency`. A sliding indicator (Motion `layoutId`, loaded with the first active section) marks the section in view.
+- **Glass pill nav** (the only glass): fixed, centred, 999 px radius, `color-mix(bay-900 86%)` with `blur(14px) saturate(160%)` (95% on phones, so text underneath never reads through), 1 px light border and an inset top highlight. Over paper sections it turns into paper at 88% (96% on phones). It falls back to opaque colour without `backdrop-filter` or under `prefers-reduced-transparency`. A sliding indicator (Motion `layoutId`, loaded with the first active section) marks the section in view.
 - **Phone menu:** a native `<dialog>` whose sheet grows out of the pill (`clip-path` from the pill's rectangle, 320 ms `--ease-drawer`) and carries its own copy of the pill header, so the menu button you see is always the one inside the modal.
 - **Booking sheet:** Base UI Drawer, bottom sheet on phones (swipe down to dismiss) and a 460 px side panel on desktop. Three steps ("1 of 3 The car") with a bicolour progress line, radio cards, 16 px inputs with `ink-700` borders, errors in `red-700` tied to fields with `aria-describedby`.
 - **Segmented control** (services): a pill track with two equal segments and a dark thumb that slides with a CSS transform, tab semantics and arrow keys.
 - **Markers and hotspots:** a 24 px ring in `green-300` holding the check glyph, and a dark label (`rgb(6 13 34 / .84)`, 4 px radius) with the name in `fog` and the value in white tabular figures.
 - **Status:** always an icon plus a word: Pass (circle check, green), Attention (triangle, amber), Fail (circle x, red). Never a pill badge, never colour alone.
 - **Report sheet:** white, 1 px `line-paper` border, 4 px radius, rows divided by hairlines. A visible "Sample report. Values are illustrative." label. Evidence photos carry a pin on the finding they document (white ring, status-coloured centre, dark label) and a report-style caption.
-- **Links:** underlined, 1 px, 3 px offset; `blue-700` on paper and `blue-300` on navy.
+- **Links:** a 1 px underline drawn as a background under the text; on hover it redraws left to right at 2 px (420 ms, `--ease-wipe`), a small echo of the scan line. `blue-700` on paper, `blue-300` on navy. Inline links keep a 44 px tap height through vertical padding that doesn't move the lines.
 
 ## 5. Layout
 
