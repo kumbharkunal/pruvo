@@ -409,16 +409,37 @@ html.lenis body {
 .text-link {
   padding-block: 12px;
   color: var(--color-blue-700);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  text-decoration: none;
+  /* The underline is a background on the content box, so the 12px tap padding doesn't push it down. */
+  background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+  background-origin: content-box;
+  background-clip: content-box;
 }
 .text-link--dark {
   color: var(--color-blue-300);
 }
+@keyframes underline-redraw {
+  0% {
+    background-position: 100% 100%;
+    background-size: 100% 2px;
+  }
+  45% {
+    background-position: 100% 100%;
+    background-size: 0% 2px;
+  }
+  46% {
+    background-position: 0 100%;
+    background-size: 0% 2px;
+  }
+  100% {
+    background-position: 0 100%;
+    background-size: 100% 2px;
+  }
+}
 @media (hover: hover) and (pointer: fine) {
   .text-link:hover {
-    text-decoration-thickness: 2px;
+    background-size: 100% 2px;
+    animation: underline-redraw 0.42s var(--ease-wipe);
   }
 }
 
@@ -499,9 +520,9 @@ html.lenis body {
   padding: 8px 8px 8px 18px;
   border-radius: 999px;
   border: 1px solid rgb(255 255 255 / 0.1);
-  background: color-mix(in oklch, var(--color-bay-900) 76%, transparent);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  backdrop-filter: blur(12px) saturate(160%);
+  background: color-mix(in oklch, var(--color-bay-900) 86%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.12),
     0 12px 32px -16px rgb(3 8 24 / 0.7);
@@ -515,10 +536,10 @@ html.lenis body {
 }
 @media (max-width: 767.98px) {
   .nav-pill {
-    background: color-mix(in oklch, var(--color-bay-900) 92%, transparent);
+    background: color-mix(in oklch, var(--color-bay-900) 95%, transparent);
   }
   .site-nav[data-nav-theme="light"] .nav-pill {
-    background: color-mix(in oklch, var(--color-paper) 94%, transparent);
+    background: color-mix(in oklch, var(--color-paper) 96%, transparent);
   }
 }
 .site-nav[data-compact] .nav-pill {
@@ -526,7 +547,7 @@ html.lenis body {
   padding-block: 6px;
 }
 .site-nav[data-nav-theme="light"] .nav-pill {
-  background: color-mix(in oklch, var(--color-paper) 80%, transparent);
+  background: color-mix(in oklch, var(--color-paper) 88%, transparent);
   border-color: rgb(12 24 60 / 0.09);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.7),
@@ -1179,7 +1200,7 @@ html.lenis body {
   position: relative;
   z-index: 2;
   order: 2;
-  margin-top: calc((var(--car-bot-n) - 1) * 177.683% + 22px);
+  margin-top: calc((var(--car-bot-n) - 1) * 177.683% + 36px);
   padding-bottom: 40px;
 }
 .hero__ctas {
@@ -1472,7 +1493,7 @@ html.lenis body {
 }
 .why__closing {
   margin: clamp(64px, 10vw, 128px) 0 0;
-  font-size: min(6.25rem, calc((100vw - 2 * var(--gutter)) / 11.5));
+  font-size: min(7rem, calc((100vw - 2 * var(--gutter)) / 8.6));
   font-stretch: 118%;
   font-weight: 620;
   line-height: 1;
@@ -1881,6 +1902,9 @@ html.lenis body {
   }
   .cp__progress {
     display: flex;
+  }
+  .cp {
+    padding-bottom: clamp(48px, 5vw, 72px);
   }
   .cp__figure {
     align-self: end;

@@ -92,7 +92,7 @@ export function ServicesToggle({ tabs: content, images }: { tabs: (typeof servic
                 ))}
               </ul>
               <button type="button" className="btn btn--primary btn--lg" data-book={k}>
-                Book an inspection
+                {k === "new" ? "Book a new-car PDI" : "Book a pre-owned inspection"}
               </button>
             </div>
           );

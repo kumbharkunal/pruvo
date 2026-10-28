@@ -125,41 +125,6 @@ function solidShieldOnKey(rgba, rgb, w, h, xMax, key, tol = 46) {
   return rgba;
 }
 
-/**
- * White rendition: the shield's white strokes touch the white page, so no fill can separate them.
- * A shield is (close to) convex: inside the convex hull of its main blue/green regions keep the
- * original pixels; outside keep a ~1.5px anti-aliased edge. Any sliver this misjudges is white on a
- * white page, which is the only place this rendition is used.
- */
-function solidShieldByHull(rgba, rgb, w, h, xMax) {
-  const { label, areas } = components(w, h, (i) => i % w < xMax && rgba[i * 4 + 3] > 160);
-  const max = Math.max(...areas);
-  const pts = [];
-  for (let y = 0; y < h; y++) for (let x = 0; x < xMax; x++) { const l = label[idx(x, y, w)]; if (l >= 0 && areas[l] >= max * 0.1) pts.push([x, y]); }
-  pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-  const lower = [], upper = [];
-  for (const p of pts) { while (lower.length >= 2 && cross(lower.at(-2), lower.at(-1), p) <= 0) lower.pop(); lower.push(p); }
-  for (const p of pts.slice().reverse()) { while (upper.length >= 2 && cross(upper.at(-2), upper.at(-1), p) <= 0) upper.pop(); upper.push(p); }
-  const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
-  const inside = (x, y) => hull.every((a, i) => cross(a, hull[(i + 1) % hull.length], [x, y]) >= 0);
-  const distToHull = (x, y) => {
-    let d = Infinity;
-    for (let i = 0; i < hull.length; i++) {
-      const [ax, ay] = hull[i], [bx, by] = hull[(i + 1) % hull.length];
-      const vx = bx - ax, vy = by - ay, t = Math.max(0, Math.min(1, ((x - ax) * vx + (y - ay) * vy) / (vx * vx + vy * vy || 1)));
-      d = Math.min(d, Math.hypot(x - (ax + t * vx), y - (ay + t * vy)));
-    }
-    return d;
-  };
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < xMax; x++) {
-      const i = idx(x, y, w);
-      if (inside(x + 0.5, y + 0.5)) { for (let c = 0; c < 3; c++) rgba[i * 4 + c] = rgb[i * 3 + c]; rgba[i * 4 + 3] = 255; }
-      else if (distToHull(x + 0.5, y + 0.5) > 1.5) rgba[i * 4 + 3] = 0;
-    }
-  return rgba;
-}
 
 /** Tight bounding box of pixels with alpha above `t`. */
 function alphaBox(rgba, w, h, t = 10) {
@@ -170,6 +135,59 @@ function alphaBox(rgba, w, h, t = 10) {
   return { left: x0, top: y0, width: x1 - x0 + 1, height: y1 - y0 + 1 };
 }
 
+/**
+ * The black-on-white rendition, cut cleanly: the shield is opaque inside its own coloured outline (holes
+ * filled, so its white car and check strokes stay) and transparent outside; the wordmark is keyed from its
+ * own darkness in its own black (#0D1014), which drops the JPEG specks that colour-to-alpha leaves behind.
+ */
+function lightOnWhite(rgb, w, h, xMax) {
+  const rgba = Buffer.alloc(w * h * 4);
+  const chroma = (i) => Math.max(rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]) - Math.min(rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]);
+  // Shield: coloured pixels left of the wordmark, plus everything they enclose.
+  const inShield = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < xMax; x++) if (chroma(idx(x, y, w)) > 36) inShield[idx(x, y, w)] = 1;
+  const outside = new Uint8Array(w * h);
+  const stack = [];
+  for (let x = 0; x < w; x++) stack.push(idx(x, 0, w), idx(x, h - 1, w));
+  for (let y = 0; y < h; y++) stack.push(idx(0, y, w), idx(w - 1, y, w));
+  while (stack.length) {
+    const i = stack.pop();
+    if (outside[i] || inShield[i]) continue;
+    outside[i] = 1;
+    const x = i % w, y = (i / w) | 0;
+    if (x > 0) stack.push(i - 1);
+    if (x < w - 1) stack.push(i + 1);
+    if (y > 0) stack.push(i - w);
+    if (y < h - 1) stack.push(i + w);
+  }
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < xMax; x++) {
+      const i = idx(x, y, w);
+      let a = 0;
+      if (!outside[i]) a = 1;
+      else {
+        // Anti-aliased rim: a pixel touching the shield keeps alpha in proportion to its colour.
+        const near = (x > 0 && !outside[i - 1]) || (x < w - 1 && !outside[i + 1]) || (y > 0 && !outside[i - w]) || (y < h - 1 && !outside[i + w]);
+        if (near) a = Math.min(1, chroma(i) / 40);
+      }
+      if (a > 0) for (let c = 0; c < 3; c++) rgba[i * 4 + c] = rgb[i * 3 + c];
+      rgba[i * 4 + 3] = Math.round(a * 255);
+    }
+  // Wordmark: darkness is coverage.
+  for (let y = 0; y < h; y++)
+    for (let x = xMax; x < w; x++) {
+      const i = idx(x, y, w);
+      const L = 0.2126 * rgb[i * 3] + 0.7152 * rgb[i * 3 + 1] + 0.0722 * rgb[i * 3 + 2];
+      let a = Math.max(0, Math.min(1, (232 - L) / (232 - 24)));
+      if (a < 0.14) a = 0;
+      rgba[i * 4] = 13;
+      rgba[i * 4 + 1] = 16;
+      rgba[i * 4 + 2] = 20;
+      rgba[i * 4 + 3] = Math.round(a * 255);
+    }
+  return dropSpecks(rgba, w, h, 30);
+}
+
 const raw = (rgba, w, h) => sharp(rgba, { raw: { width: w, height: h, channels: 4 } });
 
 async function cutout(name) {
@@ -177,10 +195,10 @@ async function cutout(name) {
   const { data: rgb, info } = await sharp(file).extract(box).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   const key = borderKey(rgb, w, h);
-  const rgba = dropSpecks(colorToAlpha(rgb, w, h, key), w, h, 80);
+  let rgba = dropSpecks(colorToAlpha(rgb, w, h, key), w, h, 80);
   const end = shieldEnd(rgba, w, h);
   if (name === "dark") solidShieldOnKey(rgba, rgb, w, h, end, key);
-  else solidShieldByHull(rgba, rgb, w, h, end);
+  else rgba = lightOnWhite(rgb, w, h, end);
   const tight = alphaBox(rgba, w, h);
   console.log(`${name}: key rgb(${key}) → ${tight.width}×${tight.height}, shield ends at x=${end}`);
   return { png: await raw(rgba, w, h).extract(tight).png().toBuffer(), shieldEnd: end - tight.left };
