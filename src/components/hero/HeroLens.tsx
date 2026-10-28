@@ -13,7 +13,8 @@ const LENS_R = 118;
  *   pointer (critically damped), resting on the car when the pointer leaves.
  * - Touch or narrow screens: the blueprint settles into a split with a draggable scan bar (its grip
  *   carries the drag cue, so nothing moves on its own). touch-action: pan-y keeps vertical scrolling native.
- * - Everyone: a real range input drives the same view for keyboard and screen-reader users.
+ * - Everyone: a real range input (transparent, laid over the car) drives the same view for keyboard and
+ *   screen-reader users; its focus ring frames the car.
  * Only transform, opacity and clip-path change; all work pauses while the hero is off screen.
  */
 export function HeroLens({ label }: { label: string }) {
