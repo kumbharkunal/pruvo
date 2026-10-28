@@ -27,7 +27,7 @@ const PANELS: Record<string, { d: string; tx: number; ty: number }> = {
   "r-quarter": { d: "M175 320H148L154 372L170 370Z", tx: 162, ty: 346 },
 };
 
-function PaintMap({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) {
+function PaintMap({ selected, onSelect, onPreview }: { selected: string; onSelect: (id: string) => void; onPreview: (id: string | null) => void }) {
   return (
     <svg className="rp-car" viewBox="0 0 200 420" role="group" aria-label="Paint thickness by panel, top view, front at the top">
       {/* decorative: wheels, mirrors, glass and plastic bumpers */}
@@ -61,6 +61,8 @@ function PaintMap({ selected, onSelect }: { selected: string; onSelect: (id: str
             aria-pressed={selected === p.id}
             aria-label={label}
             onClick={() => onSelect(p.id)}
+            onPointerEnter={(e) => e.pointerType === "mouse" && onPreview(p.id)}
+            onPointerLeave={() => onPreview(null)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -99,6 +101,7 @@ export function ReportInteractive({ label, photos }: { label: string; photos: { 
   const r = sampleReport;
   const [pane, setPane] = useState<Pane>("summary");
   const [panel, setPanel] = useState("rf-fender");
+  const [preview, setPreview] = useState<string | null>(null);
   const [seen, setSeen] = useState(false);
   const ring = useRef<SVGSVGElement>(null);
 
@@ -119,7 +122,7 @@ export function ReportInteractive({ label, photos }: { label: string; photos: { 
     return () => io.disconnect();
   }, []);
 
-  const sel = r.panels.find((p) => p.id === panel)!;
+  const sel = r.panels.find((p) => p.id === (preview ?? panel))!;
   const selStatus = paintStatus(sel.value);
   const counts = r.systems.reduce((acc, s) => ({ ...acc, [s.status]: (acc[s.status] ?? 0) + 1 }), {} as Record<Status, number>);
   const C = 2 * Math.PI * 52;
@@ -193,7 +196,7 @@ export function ReportInteractive({ label, photos }: { label: string; photos: { 
 
         <section id="rp-pane-paint" className="rp__pane rp__paint" data-active={pane === "paint" ? "" : undefined} aria-label="Paint thickness">
           <p className="rp__pane-title">Paint thickness (µm)</p>
-          <PaintMap selected={panel} onSelect={setPanel} />
+          <PaintMap selected={panel} onSelect={setPanel} onPreview={setPreview} />
           <p className={`rp__reading rp__reading--${selStatus}`} aria-live="polite">
             <StatusIcon status={selStatus} size={18} />
             <span>

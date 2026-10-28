@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 type Mode = "idle" | "lens" | "bar";
 
-const INTRO_MS = (0.2 + 1.2 + 0.4) * 1000; // delay + sweep + a short hold with every marker locked
+const INTRO_MS = (0.15 + 0.95 + 0.35) * 1000; // delay + sweep + a short hold with every marker locked
 const LENS_R = 118;
 
 /**
@@ -134,7 +134,7 @@ export function HeroLens({ label }: { label: string }) {
       xray.style.clipPath = `inset(0 ${((1 - (reduce ? rest : scanTo)) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
       stage.dataset.state = "bar";
       requestAnimationFrame(() => {
-        if (!reduce) xray.style.transition = "clip-path 0.6s cubic-bezier(0.23, 1, 0.32, 1)";
+        if (!reduce) xray.style.transition = "clip-path 0.5s cubic-bezier(0.23, 1, 0.32, 1)";
         apply();
         timers.push(window.setTimeout(() => (xray.style.transition = ""), 650));
       });

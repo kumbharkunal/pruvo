@@ -1,6 +1,7 @@
 import { services } from "@/content/site";
 import { SmartImage } from "@/components/ui/SmartImage";
 import { ServicesToggle } from "./ServicesToggle";
+import { keep } from "@/components/ui/Keep";
 
 const SIZES = "(min-width: 1024px) 46vw, 100vw";
 
@@ -12,7 +13,7 @@ export function Services() {
           <h2 id="services-title" className="t-h2">
             {services.title}
           </h2>
-          <p className="t-lead">{services.sub}</p>
+          <p className="t-lead">{keep(services.sub)}</p>
         </header>
         <ServicesToggle
           tabs={services.tabs}

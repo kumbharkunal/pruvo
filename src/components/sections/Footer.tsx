@@ -1,12 +1,11 @@
 import { footer, pageNav, site, whatsappHello } from "@/content/site";
 import { Logo } from "@/components/ui/Logo";
+import { keep } from "@/components/ui/Keep";
 import { FacebookLogo, InstagramLogo, WhatsAppLogo, YouTubeLogo } from "@/components/ui/SocialLogo";
 
 export function Footer() {
   return (
     <footer className="footer" data-theme="dark" aria-label="Footer">
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative line drawing of the hero car (Forge-style bookend) */}
-      <img className="footer__car" src="/images/og/hero-lineart.png" alt="" width={760} height={425} loading="lazy" decoding="async" />
       <div className="container-x footer__grid">
         <div className="footer__brand">
           <Logo tone="on-dark" className="footer__logo" />
@@ -15,7 +14,7 @@ export function Footer() {
             <span className="bicolor-rule" aria-hidden="true" />
             {site.lockup}
           </p>
-          <p className="footer__blurb">{footer.blurb}</p>
+          <p className="footer__blurb">{keep(footer.blurb)}</p>
         </div>
 
         <nav className="footer__nav" aria-label="Footer">

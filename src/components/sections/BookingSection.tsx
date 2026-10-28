@@ -4,6 +4,11 @@ import { WhatsAppLogo } from "@/components/ui/SocialLogo";
 export function BookingSection() {
   return (
     <section id="book" className="section section--bay book" data-theme="dark" data-sc-act="book" aria-labelledby="book-title">
+      <div className="book__art" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element -- decorative line drawing of the hero car */}
+        <img src="/images/og/hero-lineart.png" alt="" width={760} height={425} loading="lazy" decoding="async" />
+        <span className="book__lens" />
+      </div>
       <div className="container-x book__inner">
         <div className="book__copy" data-reveal>
           <h2 id="book-title" className="t-h2">

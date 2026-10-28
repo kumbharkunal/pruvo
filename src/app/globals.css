@@ -95,6 +95,15 @@
     outline-offset: 3px;
     border-radius: 2px;
   }
+  /* On navy, the blue-600 ring is under 3:1; use the light blue (8.3:1). */
+  [data-theme="dark"] :focus-visible,
+  .site-nav[data-nav-theme="dark"] :focus-visible,
+  .menu-sheet :focus-visible {
+    outline-color: var(--color-blue-300);
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
   [data-theme="dark"] :focus-visible,
   .menu-sheet :focus-visible {
     outline-color: var(--color-blue-300);
@@ -231,7 +240,7 @@ html.lenis body {
   contain-intrinsic-block-size: auto 790px;
 }
 .book {
-  contain-intrinsic-block-size: auto 600px;
+  contain-intrinsic-block-size: auto 820px;
 }
 @media (min-width: 1024px) {
   .cp {
@@ -250,7 +259,7 @@ html.lenis body {
     contain-intrinsic-block-size: auto 1000px;
   }
   .book {
-    contain-intrinsic-block-size: auto 430px;
+    contain-intrinsic-block-size: auto 760px;
   }
   .footer {
     contain-intrinsic-block-size: auto 450px;
@@ -503,6 +512,14 @@ html.lenis body {
     color 0.24s var(--ease-out),
     min-height 0.32s var(--ease-out),
     padding 0.32s var(--ease-out);
+}
+@media (max-width: 767.98px) {
+  .nav-pill {
+    background: color-mix(in oklch, var(--color-bay-900) 92%, transparent);
+  }
+  .site-nav[data-nav-theme="light"] .nav-pill {
+    background: color-mix(in oklch, var(--color-paper) 94%, transparent);
+  }
 }
 .site-nav[data-compact] .nav-pill {
   min-height: 54px;
@@ -789,13 +806,21 @@ html.lenis body {
 .hero__layer img {
   object-fit: cover;
 }
-.hero__photo,
-.hero__xray {
+.hero__photo {
   -webkit-mask-image: linear-gradient(to bottom, #000 0 calc(var(--car-bot) * 100% + 1%), transparent calc(var(--car-bot) * 100% + 10%));
   mask-image: linear-gradient(to bottom, #000 0 calc(var(--car-bot) * 100% + 1%), transparent calc(var(--car-bot) * 100% + 10%));
 }
 .hero__xray {
+  --xray-band: linear-gradient(
+    to bottom,
+    transparent calc((var(--car-top) - 0.07) * 100%),
+    #000 calc((var(--car-top) - 0.015) * 100%),
+    #000 calc((var(--car-bot) + 0.01) * 100%),
+    transparent calc((var(--car-bot) + 0.06) * 100%)
+  );
   clip-path: inset(0 100% 0 0);
+  -webkit-mask-image: var(--xray-band);
+  mask-image: var(--xray-band);
 }
 .hero__plane {
   position: absolute;
@@ -824,11 +849,11 @@ html.lenis body {
 }
 #hero-stage[data-state="intro"] .hero__plane {
   animation:
-    plane-move 1.2s var(--ease-wipe) 0.2s both,
-    plane-fade 1.2s linear 0.2s both;
+    plane-move 0.95s var(--ease-wipe) 0.15s both,
+    plane-fade 0.95s linear 0.15s both;
 }
 #hero-stage[data-state="intro"] .hero__xray {
-  animation: xray-sweep 1.2s var(--ease-wipe) 0.2s both;
+  animation: xray-sweep 0.95s var(--ease-wipe) 0.15s both;
 }
 #hero-stage[data-state="static"] .hero__xray {
   clip-path: inset(0 38% 0 var(--scan-from));
@@ -1225,10 +1250,13 @@ html.lenis body {
     top: -33.3%;
     aspect-ratio: 1672 / 941;
   }
-  .hero__photo,
-  .hero__xray {
+  .hero__photo {
     -webkit-mask-image: linear-gradient(to bottom, transparent 23.8%, #000 30% 90%, transparent 95.5%);
     mask-image: linear-gradient(to bottom, transparent 23.8%, #000 30% 90%, transparent 95.5%);
+  }
+  .hero__xray {
+    -webkit-mask-image: var(--xray-band);
+    mask-image: var(--xray-band);
   }
   .hero__bottom {
     margin-top: -3vw;
@@ -1280,11 +1308,16 @@ html.lenis body {
     bottom: 0;
     width: min(90vw, 160svh);
   }
-  .hero__photo,
-  .hero__xray {
+  .hero__photo {
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22%), linear-gradient(to bottom, transparent 0, #000 16% 92%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-image: linear-gradient(to right, transparent 0, #000 22%), linear-gradient(to bottom, transparent 0, #000 16% 92%, transparent 100%);
+    mask-composite: intersect;
+  }
+  .hero__xray {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22%), var(--xray-band);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 0, #000 22%), var(--xray-band);
     mask-composite: intersect;
   }
   .hero__top {
@@ -1297,7 +1330,7 @@ html.lenis body {
     max-width: none;
   }
   .hero__sub {
-    max-width: 30ch;
+    max-width: 36ch;
     margin-top: 24px;
     font-size: 1.1875rem;
   }
@@ -1310,6 +1343,9 @@ html.lenis body {
     padding-block: 0;
   }
   .hero__trust {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: start;
     max-width: min(520px, 38vw);
   }
   .hero__note {
@@ -1435,13 +1471,19 @@ html.lenis body {
   color: var(--color-green-700);
 }
 .why__closing {
-  margin: clamp(56px, 8vw, 96px) 0 0;
-  font-size: clamp(2rem, 1.3rem + 3.4vw, 4rem);
+  margin: clamp(64px, 10vw, 128px) 0 0;
+  font-size: min(6.25rem, calc((100vw - 2 * var(--gutter)) / 11.5));
   font-stretch: 118%;
   font-weight: 620;
-  line-height: 1.02;
+  line-height: 1;
   letter-spacing: -0.025em;
-  text-wrap: balance;
+}
+.why__closing > span {
+  display: block;
+  white-space: nowrap;
+}
+.why {
+  padding-bottom: clamp(112px, 15vw, 216px);
 }
 .why__verify {
   color: var(--color-green-700);
@@ -2185,7 +2227,16 @@ html.lenis body {
 }
 @media (hover: hover) and (pointer: fine) {
   .rp-panel:hover path {
-    stroke-width: 2.2;
+    stroke-width: 2.6;
+  }
+  .rp-panel--pass:hover path {
+    fill: #d3e9cb;
+  }
+  .rp-panel--attention:hover path {
+    fill: #f9dda6;
+  }
+  .rp-panel--fail:hover path {
+    fill: #f6c3bd;
   }
 }
 .rp__reading {
@@ -2630,9 +2681,66 @@ html.lenis body {
 
 /* ───────────────────────── Booking band ───────────────────────── */
 .book {
+  overflow: hidden;
   background:
     radial-gradient(100% 140% at 100% 0%, rgb(59 102 204 / 0.18), transparent 60%),
     var(--color-bay-900);
+}
+.book__inner {
+  position: relative;
+  z-index: 1;
+}
+/* The page ends on the hero car as a drawing, whole and below the actions, the inspection lens resting on
+   its front wheel. The band makes room for it. */
+.book {
+  --book-art: min(560px, 88vw);
+  padding-bottom: calc(clamp(56px, 7vw, 88px) + var(--book-art) * 0.56);
+}
+.book__art {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 4vw, 48px);
+  width: var(--book-art);
+  opacity: 0.5;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+.book__art img {
+  width: 100%;
+  height: auto;
+}
+.book__lens {
+  position: absolute;
+  left: 33%;
+  top: 74%;
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px solid rgb(222 232 255 / 0.9);
+  background: radial-gradient(circle, rgb(74 125 213 / 0.45), rgb(74 125 213 / 0.15) 62%, transparent 72%);
+  transform: translate(-50%, -50%);
+}
+.book__lens::before,
+.book__lens::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1.5px;
+  height: 12px;
+  background: rgb(222 232 255 / 0.9);
+}
+.book__lens::before {
+  top: -6px;
+}
+.book__lens::after {
+  bottom: -6px;
+}
+@media (min-width: 1024px) {
+  .book__art {
+    left: auto;
+    right: max(var(--gutter), calc((100% - 1280px) / 2));
+    transform: none;
+  }
 }
 .book__inner {
   display: grid;
@@ -2687,14 +2795,6 @@ html.lenis body {
   padding: clamp(64px, 8vw, 96px) 0 calc(env(safe-area-inset-bottom) + 28px);
   background: var(--color-bay-950);
   color: var(--color-white);
-}
-.footer__car {
-  position: absolute;
-  right: -8%;
-  bottom: -6%;
-  width: min(760px, 80vw);
-  opacity: 0.16;
-  pointer-events: none;
 }
 .footer__grid {
   position: relative;
@@ -3221,6 +3321,18 @@ html.lenis body {
 }
 .nf__logo {
   --logo-h: 32px;
+}
+.nf__home {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+.nf__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin-top: 8px;
 }
 .nf__car {
   width: min(560px, 90vw);

@@ -4,13 +4,14 @@ import { slotSources, type SlotEntry } from "@/lib/images";
 import { CheckGlyph } from "@/components/ui/CheckGlyph";
 import { WhatsAppLogo } from "@/components/ui/SocialLogo";
 import { HeroLens } from "./HeroLens";
+import { keep } from "@/components/ui/Keep";
 
 const WIDE = "(min-width: 768px)";
 const NARROW = "(max-width: 767.98px)";
 const SIZES_WIDE = "(min-width: 1024px) 90vw, 161vw";
 const SIZES_NARROW = "100vw";
-const SWEEP_S = 1.2;
-const SWEEP_DELAY_S = 0.2;
+const SWEEP_S = 0.95;
+const SWEEP_DELAY_S = 0.15;
 
 /** cubic-bezier(0.76, 0, 0.24, 1) (--ease-wipe): the time at which the plane has covered `p` of its path. */
 function wipeTimeAt(p: number) {
@@ -122,7 +123,7 @@ export function Hero() {
         <h1 id="hero-title" className="t-display hero__title">
           <span className="hero__line">{hero.title[0]}</span> <span className="hero__line">{hero.title[1]}</span>
         </h1>
-        <p className="hero__sub">{hero.sub}</p>
+        <p className="hero__sub">{keep(hero.sub)}</p>
       </div>
 
       <div className="hero__bottom container-x">

@@ -1,4 +1,5 @@
 import { whyPruvo } from "@/content/site";
+import { keep } from "@/components/ui/Keep";
 import { SmartImage } from "@/components/ui/SmartImage";
 import { CheckGlyph } from "@/components/ui/CheckGlyph";
 
@@ -28,7 +29,7 @@ export function WhyPruvo() {
                   <CheckGlyph className="wp__check" />
                   {p.title}
                 </dt>
-                <dd>{p.body}</dd>
+                <dd>{keep(p.body)}</dd>
               </div>
             ))}
           </dl>
