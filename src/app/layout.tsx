@@ -19,7 +19,12 @@ const isDemo = (process.env.NEXT_PUBLIC_SITE_ENV ?? "demo") === "demo";
 
 // After load, while the visitor reads the first screen, fetch the below-the-fold photos one by one so they
 // are ready when scrolled to (native lazy loading waits too long on slow 4G). Skipped on Save-Data and 2G.
-const WARM_IMAGES = `addEventListener("load",function(){var c=navigator.connection;if(c&&(c.saveData||/2g/.test(c.effectiveType||"")))return;function go(){[].filter.call(document.querySelectorAll('img[loading="lazy"]'),function(i){return !i.checkVisibility||i.checkVisibility()}).forEach(function(i,k){setTimeout(function(){i.loading="eager"},k*120)})}window.requestIdleCallback?requestIdleCallback(go,{timeout:4000}):setTimeout(go,2000)},{once:true});`;
+// Waits until the hero's x-ray twin has arrived (the stage gets a data-state), so they never compete with it.
+const WARM_IMAGES = `addEventListener("load",function(){var c=navigator.connection;if(c&&(c.saveData||/2g/.test(c.effectiveType||"")))return;function go(){[].filter.call(document.querySelectorAll('img[loading="lazy"]'),function(i){return !i.checkVisibility||i.checkVisibility()}).forEach(function(i,k){setTimeout(function(){i.loading="eager"},k*120)})}function idle(){window.requestIdleCallback?requestIdleCallback(go,{timeout:4000}):setTimeout(go,2000)}var s=document.getElementById("hero-stage");if(!s||s.dataset.state)idle();else{var m=new MutationObserver(function(){if(s.dataset.state){m.disconnect();idle()}});m.observe(s,{attributes:true,attributeFilter:["data-state"]})}},{once:true});`;
+
+// A short tap of haptic feedback on every button, link and control, where the device supports vibration
+// (Android browsers; iOS Safari has no Vibration API, so it stays silent there).
+const HAPTICS = `document.addEventListener("click",function(e){var t=e.target;if(!navigator.vibrate||!t||!t.closest)return;if(t.closest('a[href],button,summary,label,select,[role="button"],[role="tab"],[role="radio"],[role="menuitem"],input[type="radio"],input[type="checkbox"],input[type="submit"]'))try{navigator.vibrate(12)}catch(_){}},{capture:true,passive:true});`;
 const relay = (["off", "dry-run", "on"].includes(process.env.BOOKING_RELAY ?? "") ? process.env.BOOKING_RELAY : "off") as RelayMode;
 
 const title = "Pruvo car inspection: new-car PDI and used car inspection";
@@ -71,6 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <BookingRoot relay={relay} />
         <script dangerouslySetInnerHTML={{ __html: WARM_IMAGES }} />
+        <script dangerouslySetInnerHTML={{ __html: HAPTICS }} />
       </body>
     </html>
   );
