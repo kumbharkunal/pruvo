@@ -93,7 +93,9 @@ const PANES: { id: Pane; label: string }[] = [
   { id: "photos", label: "Photos" },
 ];
 
-export function ReportInteractive({ label, photos }: { label: string; photos: { caption: string; node: React.ReactNode }[] }) {
+type Pin = { x: number; y: number; side: "left" | "right" | "bottom"; label: string; status: Status };
+
+export function ReportInteractive({ label, photos }: { label: string; photos: { caption: string; pin: Pin; node: React.ReactNode }[] }) {
   const r = sampleReport;
   const [pane, setPane] = useState<Pane>("summary");
   const [panel, setPanel] = useState("rf-fender");
@@ -222,7 +224,13 @@ export function ReportInteractive({ label, photos }: { label: string; photos: { 
         <section id="rp-pane-photos" className="rp__pane rp__photos" data-active={pane === "photos" ? "" : undefined} aria-label="Photo evidence">
           {photos.map((p) => (
             <figure key={p.caption} className="rp__photo">
-              {p.node}
+              <div className="rp__photo-frame">
+                {p.node}
+                <span className="rp-pin" data-side={p.pin.side} data-status={p.pin.status} aria-hidden="true" style={{ "--x": `${p.pin.x}%`, "--y": `${p.pin.y}%` } as React.CSSProperties}>
+                  <span className="rp-pin__ring" />
+                  <span className="rp-pin__label">{p.pin.label}</span>
+                </span>
+              </div>
               <figcaption>{p.caption}</figcaption>
             </figure>
           ))}

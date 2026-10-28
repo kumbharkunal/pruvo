@@ -57,8 +57,6 @@
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     scroll-padding-top: 84px;
-    /* Locking scroll under the menu or the booking sheet hides the scrollbar; keep its space so nothing jumps. */
-    scrollbar-gutter: stable;
     background: var(--color-bay-950);
   }
   body {
@@ -150,12 +148,13 @@ html.lenis body {
 }
 
 /* ───────────────────────── Type scale: 5 sizes ───────────────────────── */
+/* Phones: the wide cut at a size that keeps "Professional eyes," on one line (8.64 em wide at 105%). */
 .t-display {
-  font-size: clamp(2.375rem, 1.3rem + 5.4vw, 3.25rem);
-  font-stretch: 88%;
+  font-size: min(3.25rem, 100cqi / 8.9);
+  font-stretch: 105%;
   font-weight: 620;
   line-height: 0.98;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 @media (min-width: 768px) {
   .t-display {
@@ -307,6 +306,21 @@ html.lenis body {
 .btn:active {
   transform: scale(0.97);
 }
+/* Hover: a fill sweeps across the button, left to right in the scan's easing (navy on paper, white on navy). */
+.btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-sweep, transparent);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.28s var(--ease-wipe);
+}
 .btn--sm {
   min-height: 40px;
   padding: 0 14px;
@@ -323,18 +337,27 @@ html.lenis body {
   font-size: 1.125rem;
 }
 .btn--primary {
+  --btn-sweep: var(--color-bay-900);
   background: var(--color-blue-600);
   color: var(--color-white);
 }
 .btn--ghost-dark {
+  --btn-sweep: var(--color-white);
   background: rgb(255 255 255 / 0.04);
   border-color: rgb(214 226 255 / 0.34);
   color: var(--color-white);
 }
 .btn--ghost-light {
+  --btn-sweep: var(--color-bay-900);
   background: transparent;
   border-color: var(--color-ink-700);
   color: var(--color-ink-900);
+}
+/* On navy, the primary sweep is white and its label turns navy. */
+[data-theme="dark"] .btn--primary,
+.site-nav[data-nav-theme="dark"] .btn--primary,
+.menu-sheet .btn--primary {
+  --btn-sweep: var(--color-white);
 }
 .btn--quiet {
   background: transparent;
@@ -342,15 +365,21 @@ html.lenis body {
   padding-inline: 10px;
 }
 @media (hover: hover) and (pointer: fine) {
-  .btn--primary:hover {
-    background: var(--color-blue-700);
+  .btn:hover::before {
+    clip-path: inset(0 0 0 0);
+  }
+  [data-theme="dark"] .btn--primary:hover,
+  .site-nav[data-nav-theme="dark"] .btn--primary:hover,
+  .menu-sheet .btn--primary:hover,
+  .btn--ghost-dark:hover {
+    color: var(--color-bay-900);
   }
   .btn--ghost-dark:hover {
-    background: rgb(255 255 255 / 0.1);
-    border-color: rgb(214 226 255 / 0.6);
+    border-color: var(--color-white);
   }
   .btn--ghost-light:hover {
-    background: rgb(14 24 56 / 0.05);
+    border-color: var(--color-bay-900);
+    color: var(--color-white);
   }
   .btn--quiet:hover {
     color: var(--color-ink-900);
@@ -802,7 +831,7 @@ html.lenis body {
   animation: xray-sweep 1.2s var(--ease-wipe) 0.2s both;
 }
 #hero-stage[data-state="static"] .hero__xray {
-  clip-path: inset(0 38% 0 0);
+  clip-path: inset(0 38% 0 var(--scan-from));
 }
 #hero-stage[data-state="lens"] .hero__xray {
   transition: opacity 0.4s var(--ease-out);
@@ -829,10 +858,10 @@ html.lenis body {
 }
 @keyframes xray-sweep {
   from {
-    clip-path: inset(0 calc(100% - var(--scan-from)) 0 0);
+    clip-path: inset(0 calc(100% - var(--scan-from)) 0 var(--scan-from));
   }
   to {
-    clip-path: inset(0 calc(100% - var(--scan-to)) 0 0);
+    clip-path: inset(0 calc(100% - var(--scan-to)) 0 var(--scan-from));
   }
 }
 
@@ -1071,6 +1100,7 @@ html.lenis body {
 
 /* Hero copy */
 .hero__top {
+  container-type: inline-size;
   position: relative;
   z-index: 2;
   order: 0;
@@ -1187,7 +1217,7 @@ html.lenis body {
     top: 66%;
   }
   #hero-stage[data-state="static"] .hero__xray {
-    clip-path: inset(0 32% 0 0);
+    clip-path: inset(0 32% 0 var(--scan-from));
   }
   /* The tablet box overhangs the stage (left -53%, 155% wide): keep the focus frame inside the window. */
   .hero__box:has(.hero__range:focus-visible)::after {
@@ -1593,7 +1623,21 @@ html.lenis body {
 }
 .cp__stage {
   display: grid;
+  grid-template-areas: "figure" "list" "after";
   gap: 28px;
+}
+.cp__figure {
+  grid-area: figure;
+}
+.cp__list {
+  grid-area: list;
+}
+.cp__after {
+  grid-area: after;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
 }
 .cp__figure {
   position: relative;
@@ -1758,12 +1802,21 @@ html.lenis body {
   }
   .cp__stage {
     grid-template-columns: 1.55fr 1fr;
-    gap: 48px;
+    grid-template-areas: "figure list" "after list";
+    grid-template-rows: auto auto;
+    gap: 24px 48px;
+    align-content: center;
     align-items: center;
     min-height: min(calc(100svh - 120px), 720px);
   }
   .cp__progress {
     display: flex;
+  }
+  .cp__figure {
+    align-self: end;
+  }
+  .cp__after {
+    align-self: start;
   }
   /* Evidence photos sit in the empty studio above the bonnet, clear of every hotspot that has one. */
   .cp__inset {
@@ -2255,6 +2308,66 @@ html.lenis body {
   }
 }
 
+/* Evidence pins: each photo points at the finding it documents. */
+.rp__photo-frame {
+  position: relative;
+}
+.rp-pin {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0;
+  height: 0;
+}
+.rp-pin__ring {
+  position: absolute;
+  left: -13px;
+  top: -13px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgb(6 13 34 / 0.35);
+}
+.rp-pin__ring::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: var(--pin, var(--color-green-300));
+}
+.rp-pin[data-status="attention"] {
+  --pin: var(--color-amber-300);
+}
+.rp-pin[data-status="fail"] {
+  --pin: var(--color-red-300);
+}
+.rp-pin__label {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  padding: 4px 8px;
+  border-radius: var(--r-1);
+  background: rgb(6 13 34 / 0.86);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 620;
+  font-stretch: 87%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+.rp-pin[data-side="left"] .rp-pin__label {
+  left: auto;
+  right: 20px;
+}
+.rp-pin[data-side="bottom"] .rp-pin__label {
+  top: 20px;
+  left: 0;
+  transform: translateX(-50%);
+}
+
 /* ───────────────────────── How it works ───────────────────────── */
 .how__steps {
   position: relative;
@@ -2659,20 +2772,26 @@ html.lenis body {
     0 0 0 1px rgb(12 24 60 / 0.06);
   opacity: 0;
   transform: translateY(8px) scale(0.96);
-  visibility: hidden;
+  display: none;
   transition:
     opacity 0.2s var(--ease-out),
     transform 0.2s var(--ease-out),
     visibility 0s linear 0.2s;
 }
 .wa-fab[data-show] {
+  display: grid;
   opacity: 1;
   transform: none;
-  visibility: visible;
   transition:
     opacity 0.2s var(--ease-out),
     transform 0.2s var(--ease-out),
-    visibility 0s;
+    display 0.2s allow-discrete;
+}
+@starting-style {
+  .wa-fab[data-show] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
 }
 .wa-fab__logo {
   width: 30px;
@@ -3096,6 +3215,14 @@ html.lenis body {
   color: var(--color-fog);
   font-size: 0.8125rem;
   text-transform: capitalize;
+}
+
+/* Moving between the 404 and the homepage cross-fades instead of cutting. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-group(root) {
+  animation-duration: 0.3s;
 }
 
 /* ───────────────────────── Reduced motion: instant or opacity-only ───────────────────────── */

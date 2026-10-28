@@ -6,6 +6,7 @@ import { ReportInteractive } from "./ReportInteractive";
 export function SampleReport() {
   const photos = sampleReport.photos.map((p) => ({
     caption: p.caption,
+    pin: p.pin,
     node: <SmartImage slot={p.slot} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 100vw" imgClassName="rp__photo-img" />,
   }));
   return (

@@ -81,6 +81,15 @@ export function Checkpoints() {
             </figcaption>
           </figure>
 
+          <div className="cp__after">
+            <button type="button" className="btn btn--primary btn--lg" data-book="">
+              Book an inspection
+            </button>
+            <a href="#report" className="text-link text-link--dark">
+              See a sample report
+            </a>
+          </div>
+
           <ol className="cp__list" role="list">
             {c.systems.map((s) => (
               <li key={s.id} className="cp__row" data-cp-row={s.id}>

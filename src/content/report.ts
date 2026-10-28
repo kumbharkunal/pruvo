@@ -51,9 +51,10 @@ export const sampleReport = {
     { name: "Documents", status: "pass" as Status, note: "Chassis and engine numbers match the RC" },
   ],
   obd: [{ code: "P0420", text: "Catalyst efficiency below threshold", status: "attention" as Status }],
+  /** Each photo pins the finding it documents (x/y in % of the photo). */
   photos: [
-    { slot: "obd-scan-closeup", caption: "OBD scan: 1 stored code" },
-    { slot: "paint-gauge-macro", caption: "Paint thickness, panel by panel" },
-    { slot: "underbody-inspection", caption: "Underbody and suspension" },
+    { slot: "obd-scan-closeup", caption: "OBD port: P0420 stored, catalyst below threshold", pin: { x: 66, y: 36, side: "bottom", label: "P0420", status: "attention" } },
+    { slot: "paint-gauge-macro", caption: "Right front fender: 512 µm, filler likely", pin: { x: 47, y: 39, side: "right", label: "512 µm", status: "fail" } },
+    { slot: "underbody-inspection", caption: "Exhaust hangers: surface rust only", pin: { x: 69, y: 23, side: "left", label: "Surface rust", status: "pass" } },
   ] as const,
 };

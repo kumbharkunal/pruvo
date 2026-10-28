@@ -66,7 +66,7 @@ export function HeroLens({ label }: { label: string }) {
     const startLens = () => {
       mode.current = "lens";
       // Freeze the intro's end state inline, then hand over (the animation stops applying with the state change).
-      xray.style.clipPath = `inset(0 ${((1 - scanTo) * 100).toFixed(2)}% 0 0)`;
+      xray.style.clipPath = `inset(0 ${((1 - scanTo) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
       stage.dataset.state = "lens";
       xray.style.opacity = "0";
       const restX = () => rect.width * ((scanFrom + scanTo) / 2 + 0.02);
@@ -125,12 +125,12 @@ export function HeroLens({ label }: { label: string }) {
       const rest = window.matchMedia("(min-width: 768px)").matches ? 0.68 : 0.62;
       let split = rest;
       const apply = () => {
-        xray.style.clipPath = `inset(0 ${((1 - split) * 100).toFixed(2)}% 0 0)`;
+        xray.style.clipPath = `inset(0 ${((1 - split) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
         handleEl.style.transform = `translate3d(${(split * rect.width).toFixed(1)}px, 0, 0)`;
         const v = Math.round(((split - scanFrom) / (scanTo - scanFrom)) * 100);
         if (range.current) range.current.value = String(v);
       };
-      xray.style.clipPath = `inset(0 ${((1 - (reduce ? rest : scanTo)) * 100).toFixed(2)}% 0 0)`;
+      xray.style.clipPath = `inset(0 ${((1 - (reduce ? rest : scanTo)) * 100).toFixed(2)}% 0 ${(scanFrom * 100).toFixed(2)}%)`;
       stage.dataset.state = "bar";
       requestAnimationFrame(() => {
         if (!reduce) xray.style.transition = "clip-path 0.6s cubic-bezier(0.23, 1, 0.32, 1)";

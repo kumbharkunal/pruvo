@@ -15,11 +15,14 @@ export const getLenis = () => instance;
 /** Locks page scroll for an open menu or sheet. Returns the unlock function. */
 export function lockScroll() {
   const html = document.documentElement;
-  const prev = html.style.overflow;
+  const prev = { overflow: html.style.overflow, gutter: html.style.scrollbarGutter };
+  // Keep the scrollbar's space while it is hidden, so the page behind doesn't shift sideways.
+  html.style.scrollbarGutter = "stable";
   html.style.overflow = "hidden";
   instance?.stop();
   return () => {
-    html.style.overflow = prev;
+    html.style.overflow = prev.overflow;
+    html.style.scrollbarGutter = prev.gutter;
     instance?.start();
   };
 }
