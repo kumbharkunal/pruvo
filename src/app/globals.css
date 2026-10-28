@@ -3327,6 +3327,14 @@ html.lenis body {
   min-height: 44px;
   align-items: center;
 }
+@media (hover: hover) and (pointer: fine) {
+  .nf__home {
+    transition: opacity 0.18s var(--ease-out);
+  }
+  .nf__home:hover {
+    opacity: 0.78;
+  }
+}
 .nf__actions {
   display: flex;
   flex-wrap: wrap;
